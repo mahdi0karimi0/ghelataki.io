@@ -91,7 +91,6 @@
             object-fit: cover;
             box-shadow: 0 0 10px currentColor;
             background: #333;
-            /* پس‌زمینه برای وقتی عکس بارگیری نشده */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,7 +156,6 @@
             font-size: 0.9rem;
             pointer-events: none;
         }
-        /* دکمه بازی مجدد فوری */
         
         #quick-restart {
             background: linear-gradient(45deg, #ff0055, #ff66cc);
@@ -172,7 +170,26 @@
             margin-top: 15px;
             pointer-events: auto;
             display: block;
-            /* مهم: فعال کردن کلیک */
+            animation: popIn 0.3s ease-out;
+            transition: transform 0.1s;
+        }
+        
+        #quick-restart:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -237,7 +254,7 @@
             amirreza: new Image()
         };
 
-        // مسیر عکس‌ها - فقط کافیه فایل‌های زیر را در پوشه قرار بدی
+        // مسیر عکس‌ها
         charImages.amir.src = 'amir.jpg';
         charImages.mahdi.src = 'mahdi.jpg';
         charImages.amirreza.src = 'amirreza.jpg';
@@ -245,12 +262,22 @@
         // نمایش پیام بارگیری عکس‌ها
         Object.keys(charImages).forEach(key => {
             charImages[key].onload = () => {
-                document.getElementById(`${key}-icon`).innerHTML = '';
-                document.getElementById(`${key}-icon`).style.background = 'none';
+                const icon = document.getElementById(`${key}-icon`);
+                if (icon) {
+                    icon.innerHTML = '';
+                    icon.style.background = 'none';
+                    icon.style.backgroundImage = `url(${charImages[key].src})`;
+                    icon.style.backgroundSize = 'cover';
+                    icon.style.backgroundPosition = 'center';
+                }
             };
             charImages[key].onerror = () => {
-                document.getElementById(`${key}-icon`).innerHTML = 'عکس موجود نیست!';
-                document.getElementById(`${key}-icon`).style.color = '#ff0055';
+                const icon = document.getElementById(`${key}-icon`);
+                if (icon) {
+                    icon.innerHTML = '🚴';
+                    icon.style.color = '#ff0055';
+                    icon.style.fontSize = '2rem';
+                }
             };
         });
 
@@ -277,7 +304,8 @@
             y: 0,
             width: 80,
             height: 80,
-            targetX: 0
+            targetX: 0,
+            color: characters[selectedCharKey].color
         };
 
         let obstacles = [];
@@ -304,9 +332,11 @@
                 card.style.borderColor = '#333';
                 card.style.boxShadow = 'none';
             });
-            event.currentTarget.classList.add('selected');
-            event.currentTarget.style.borderColor = characters[key].color;
-            event.currentTarget.style.boxShadow = `0 0 15px ${characters[key].color}`;
+
+            const selectedCard = event.currentTarget;
+            selectedCard.classList.add('selected');
+            selectedCard.style.borderColor = characters[key].color;
+            selectedCard.style.boxShadow = `0 0 15px ${characters[key].color}`;
         }
 
         function startGame() {
@@ -315,26 +345,45 @@
             gameRunning = true;
             score = 0;
             speed = 5;
+            frame = 0;
             obstacles = [];
             particles = [];
-            frame = 0;
+
+            player.lane = 1;
             updatePlayerTargetX();
             player.x = player.targetX;
+
             animate();
         }
 
-        // بازی مجدد فوری بدون برگشت به منو
+        // 🔧 بازی مجدد فوری - نسخه کاملاً اصلاح‌شده
         function quickRestart() {
+            // توقف کامل انیمیشن قبلی
+            cancelAnimationFrame(animationId);
+
+            // مخفی کردن صفحه باخت
             document.getElementById('game-over-layer').style.display = 'none';
+
+            // ریست کامل متغیرهای بازی
             gameRunning = true;
             score = 0;
             speed = 5;
+            frame = 0;
             obstacles = [];
             particles = [];
-            frame = 0;
+
+            // ریست موقعیت و وضعیت بازیکن
+            player.lane = 1;
+            player.color = characters[selectedCharKey].color;
             updatePlayerTargetX();
             player.x = player.targetX;
-            document.getElementById('score-display').style.display = 'block';
+
+            // نمایش مجدد نمایشگر امتیاز
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.style.display = 'block';
+            scoreDisplay.innerText = `امتیاز: 0`;
+
+            // شروع مجدد حلقه بازی
             animate();
         }
 
@@ -362,13 +411,22 @@
             player.targetX = (player.lane * laneWidth) + (laneWidth / 2);
         }
 
+        // کنترل‌های لمسی
         window.addEventListener('touchstart', (e) => {
             if (!gameRunning) return;
+            e.preventDefault();
             const touchX = e.touches[0].clientX;
             if (touchX < width / 2) moveLeft();
             else moveRight();
         }, {
             passive: false
+        });
+
+        // کنترل‌های کیبورد (برای تست روی دسکتاپ)
+        window.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
+            if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
         });
 
         // کلاس موانع
@@ -392,7 +450,11 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = this.color;
                 ctx.beginPath();
-                ctx.roundRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, 10);
+                if (ctx.roundRect) {
+                    ctx.roundRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, 10);
+                } else {
+                    ctx.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+                }
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
@@ -408,11 +470,13 @@
                 this.speedX = (Math.random() - 0.5) * 10;
                 this.speedY = (Math.random() - 0.5) * 10;
                 this.life = 1;
+                this.decay = 0.015 + Math.random() * 0.01;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                this.life -= 0.02;
+                this.life -= this.decay;
+                this.speedY += 0.1; // گرانش کوچک
             }
             draw() {
                 ctx.globalAlpha = this.life;
@@ -425,7 +489,7 @@
         }
 
         function createExplosion(x, y, color) {
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 40; i++) {
                 particles.push(new Particle(x, y, color));
             }
         }
@@ -454,7 +518,10 @@
 
             // رسم عکس شخصیت
             const img = charImages[selectedCharKey];
-            if (img.complete && img.naturalWidth !== 0) {
+            if (img && img.complete && img.naturalWidth !== 0) {
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = player.color;
                 ctx.drawImage(
                     img,
                     player.x - player.width / 2,
@@ -462,26 +529,44 @@
                     player.width,
                     player.height
                 );
+                ctx.restore();
             } else {
                 // پس‌زمینه برای وقتی عکس بارگیری نشده
-                ctx.fillStyle = characters[selectedCharKey].color;
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = player.color;
+                ctx.fillStyle = player.color;
                 ctx.beginPath();
                 ctx.arc(player.x, player.y, player.width / 2, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.fillStyle = '#fff';
-                ctx.font = '12px Arial';
+                ctx.font = 'bold 10px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('در حال بارگیری...', player.x, player.y + 5);
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🚴', player.x, player.y);
+                ctx.restore();
             }
         }
 
         function checkCollision(obs) {
-            if (player.y < obs.y + obs.height / 2 && player.y + player.height / 2 > obs.y) {
-                if (Math.abs(player.x - obs.x) < 40) {
-                    return true;
-                }
-            }
-            return false;
+            const dx = Math.abs(player.x - obs.x);
+            const dy = Math.abs(player.y - obs.y);
+            return (dx < (player.width / 2 + obs.width / 2 - 15) &&
+                dy < (player.height / 2 + obs.height / 2 - 15));
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            drawRoad();
+
+            // رسم موانع
+            obstacles.forEach(obs => obs.draw());
+
+            // رسم بازیکن
+            drawPlayer();
+
+            // رسم ذرات
+            particles.forEach(p => p.draw());
         }
 
         function animate() {
@@ -491,13 +576,18 @@
             drawRoad();
 
             if (gameRunning) {
-                if (frame % 60 === 0) {
+                // تولید موانع جدید
+                if (frame % Math.max(30, 90 - Math.floor(score / 50)) === 0) {
                     obstacles.push(new Obstacle());
                     score += 10;
-                    if (frame % 300 === 0) speed += 0.5;
                 }
 
-                // آپدیت موانع
+                // افزایش تدریجی سرعت
+                if (frame % 300 === 0 && speed < 15) {
+                    speed += 0.3;
+                }
+
+                // آپدیت و رسم موانع
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     let obs = obstacles[i];
                     obs.update();
@@ -505,22 +595,24 @@
 
                     if (checkCollision(obs)) {
                         gameOver();
+                        return;
                     }
 
                     if (obs.y > height + 100) {
                         obstacles.splice(i, 1);
+                        score += 2;
                     }
                 }
 
                 drawPlayer();
-                score += 0.1;
+                score += 0.15;
                 document.getElementById('score-display').innerText = `امتیاز: ${Math.floor(score)}`;
                 frame++;
             } else {
                 drawPlayer();
             }
 
-            // آپدیت ذرات
+            // آپدیت و رسم ذرات انفجار
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.update();
@@ -533,7 +625,7 @@
             }
         }
 
-        // رسم اولیه
+        // رسم اولیه برای پیش‌نمایش
         resize();
         drawRoad();
         drawPlayer();
