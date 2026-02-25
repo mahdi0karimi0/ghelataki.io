@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مسابقه دوچرخه‌سواری نئونی</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #050510;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #character-select {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #00f2ff;
+            text-align: center;
+            pointer-events: auto;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+            transition: opacity 0.5s;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #fff;
+            font-size: 1.8rem;
+        }
+        
+        .char-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .char-card {
+            background: #1a1a2e;
+            border: 2px solid #333;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100px;
+        }
+        
+        .char-card:hover,
+        .char-card.selected {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px currentColor;
+            border-color: currentColor;
+        }
+        
+        .char-name {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .char-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto;
+            object-fit: cover;
+            box-shadow: 0 0 10px currentColor;
+            background: #333;
+            /* پس‌زمینه برای وقتی عکس بارگیری نشده */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 0.7rem;
+        }
+        
+        #start-btn {
+            background: linear-gradient(45deg, #00f2ff, #0066ff);
+            border: none;
+            padding: 12px 40px;
+            color: white;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            font-family: inherit;
+            pointer-events: auto;
+        }
+        
+        #score-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #fff;
+            pointer-events: none;
+            display: none;
+        }
+        
+        #game-over {
+            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #ff0055;
+            text-align: center;
+            pointer-events: auto;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+        }
+        
+        #game-over h2 {
+            color: #ff0055;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px #ff0055;
+        }
+        
+        #final-score {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        /* دکمه بازی مجدد فوری */
+        
+        #quick-restart {
+            background: linear-gradient(45deg, #ff0055, #ff66cc);
+            border: none;
+            padding: 15px 35px;
+            color: white;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+            font-family: inherit;
+            margin-top: 15px;
+            pointer-events: auto;
+            display: block;
+            /* مهم: فعال کردن کلیک */
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="score-display">امتیاز: 0</div>
+
+    <!-- منوی انتخاب شخصیت -->
+    <div class="ui-layer" id="menu-layer">
+        <div id="character-select">
+            <h1>قهرمان خود را انتخاب کنید</h1>
+            <div class="char-container">
+                <!-- امیرمحمد -->
+                <div class="char-card selected" onclick="selectChar('amir')" style="color: #00f2ff;">
+                    <div class="char-icon" id="amir-icon">در حال بارگیری...</div>
+                    <div class="char-name">امیرمحمد</div>
+                </div>
+                <!-- مهدی -->
+                <div class="char-card" onclick="selectChar('mahdi')" style="color: #00ff66;">
+                    <div class="char-icon" id="mahdi-icon">در حال بارگیری...</div>
+                    <div class="char-name">مهدی</div>
+                </div>
+                <!-- امیررضا -->
+                <div class="char-card" onclick="selectChar('amirreza')" style="color: #ff0055;">
+                    <div class="char-icon" id="amirreza-icon">در حال بارگیری...</div>
+                    <div class="char-name">امیررضا</div>
+                </div>
+            </div>
+            <button id="start-btn" onclick="startGame()">شروع مسابقه</button>
+        </div>
+    </div>
+
+    <!-- صفحه باخت -->
+    <div class="ui-layer" id="game-over-layer" style="display: none;">
+        <div id="game-over">
+            <h2>تصادف کردی!</h2>
+            <p id="final-score">امتیاز نهایی: 0</p>
+            <button id="quick-restart" onclick="quickRestart()">بازی مجدد فوری</button>
+        </div>
+    </div>
+
+    <div class="controls-hint">برای حرکت به چپ یا راست ضربه بزنید</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let gameRunning = false;
+        let score = 0;
+        let speed = 5;
+        let frame = 0;
+        let animationId;
+        let selectedCharKey = 'amir';
+
+        // آماده‌سازی عکس‌ها
+        const charImages = {
+            amir: new Image(),
+            mahdi: new Image(),
+            amirreza: new Image()
+        };
+
+        // مسیر عکس‌ها - فقط کافیه فایل‌های زیر را در پوشه قرار بدی
+        charImages.amir.src = 'amir.jpg';
+        charImages.mahdi.src = 'mahdi.jpg';
+        charImages.amirreza.src = 'amirreza.jpg';
+
+        // نمایش پیام بارگیری عکس‌ها
+        Object.keys(charImages).forEach(key => {
+            charImages[key].onload = () => {
+                document.getElementById(`${key}-icon`).innerHTML = '';
+                document.getElementById(`${key}-icon`).style.background = 'none';
+            };
+            charImages[key].onerror = () => {
+                document.getElementById(`${key}-icon`).innerHTML = 'عکس موجود نیست!';
+                document.getElementById(`${key}-icon`).style.color = '#ff0055';
+            };
+        });
+
+        // تنظیمات شخصیت‌ها
+        const characters = {
+            'amir': {
+                name: 'امیرمحمد',
+                color: '#00f2ff'
+            },
+            'mahdi': {
+                name: 'مهدی',
+                color: '#00ff66'
+            },
+            'amirreza': {
+                name: 'امیررضا',
+                color: '#ff0055'
+            }
+        };
+
+        // تنظیمات بازیکن
+        const player = {
+            lane: 1,
+            x: 0,
+            y: 0,
+            width: 80,
+            height: 80,
+            targetX: 0
+        };
+
+        let obstacles = [];
+        let particles = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            player.y = height - 150;
+            updatePlayerTargetX();
+            player.x = player.targetX;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function selectChar(key) {
+            selectedCharKey = key;
+            player.color = characters[key].color;
+
+            document.querySelectorAll('.char-card').forEach(card => {
+                card.classList.remove('selected');
+                card.style.borderColor = '#333';
+                card.style.boxShadow = 'none';
+            });
+            event.currentTarget.classList.add('selected');
+            event.currentTarget.style.borderColor = characters[key].color;
+            event.currentTarget.style.boxShadow = `0 0 15px ${characters[key].color}`;
+        }
+
+        function startGame() {
+            document.getElementById('menu-layer').style.display = 'none';
+            document.getElementById('score-display').style.display = 'block';
+            gameRunning = true;
+            score = 0;
+            speed = 5;
+            obstacles = [];
+            particles = [];
+            frame = 0;
+            updatePlayerTargetX();
+            player.x = player.targetX;
+            animate();
+        }
+
+        // بازی مجدد فوری بدون برگشت به منو
+        function quickRestart() {
+            document.getElementById('game-over-layer').style.display = 'none';
+            gameRunning = true;
+            score = 0;
+            speed = 5;
+            obstacles = [];
+            particles = [];
+            frame = 0;
+            updatePlayerTargetX();
+            player.x = player.targetX;
+            document.getElementById('score-display').style.display = 'block';
+            animate();
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            document.getElementById('game-over-layer').style.display = 'flex';
+            document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)}`;
+            createExplosion(player.x, player.y, characters[selectedCharKey].color);
+            draw();
+        }
+
+        function moveLeft() {
+            if (player.lane > 0) player.lane--;
+            updatePlayerTargetX();
+        }
+
+        function moveRight() {
+            if (player.lane < 2) player.lane++;
+            updatePlayerTargetX();
+        }
+
+        function updatePlayerTargetX() {
+            const laneWidth = width / 3;
+            player.targetX = (player.lane * laneWidth) + (laneWidth / 2);
+        }
+
+        window.addEventListener('touchstart', (e) => {
+            if (!gameRunning) return;
+            const touchX = e.touches[0].clientX;
+            if (touchX < width / 2) moveLeft();
+            else moveRight();
+        }, {
+            passive: false
+        });
+
+        // کلاس موانع
+        class Obstacle {
+            constructor() {
+                const laneWidth = width / 3;
+                this.lane = Math.floor(Math.random() * 3);
+                this.x = (this.lane * laneWidth) + (laneWidth / 2);
+                this.y = -100;
+                this.width = 50;
+                this.height = 50;
+                this.color = '#ffaa00';
+            }
+
+            update() {
+                this.y += speed;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.roundRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, 10);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // کلاس ذرات انفجار
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = (Math.random() - 0.5) * 10;
+                this.speedY = (Math.random() - 0.5) * 10;
+                this.life = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function drawRoad() {
+            const laneWidth = width / 3;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([20, 20]);
+            ctx.lineDashOffset = -frame * speed;
+
+            for (let i = 1; i < 3; i++) {
+                const x = i * laneWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+        }
+
+        function drawPlayer() {
+            // حرکت نرم به سمت لاین هدف
+            player.x += (player.targetX - player.x) * 0.2;
+
+            // رسم عکس شخصیت
+            const img = charImages[selectedCharKey];
+            if (img.complete && img.naturalWidth !== 0) {
+                ctx.drawImage(
+                    img,
+                    player.x - player.width / 2,
+                    player.y - player.height / 2,
+                    player.width,
+                    player.height
+                );
+            } else {
+                // پس‌زمینه برای وقتی عکس بارگیری نشده
+                ctx.fillStyle = characters[selectedCharKey].color;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('در حال بارگیری...', player.x, player.y + 5);
+            }
+        }
+
+        function checkCollision(obs) {
+            if (player.y < obs.y + obs.height / 2 && player.y + player.height / 2 > obs.y) {
+                if (Math.abs(player.x - obs.x) < 40) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function animate() {
+            if (!gameRunning && particles.length === 0) return;
+
+            ctx.clearRect(0, 0, width, height);
+            drawRoad();
+
+            if (gameRunning) {
+                if (frame % 60 === 0) {
+                    obstacles.push(new Obstacle());
+                    score += 10;
+                    if (frame % 300 === 0) speed += 0.5;
+                }
+
+                // آپدیت موانع
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    let obs = obstacles[i];
+                    obs.update();
+                    obs.draw();
+
+                    if (checkCollision(obs)) {
+                        gameOver();
+                    }
+
+                    if (obs.y > height + 100) {
+                        obstacles.splice(i, 1);
+                    }
+                }
+
+                drawPlayer();
+                score += 0.1;
+                document.getElementById('score-display').innerText = `امتیاز: ${Math.floor(score)}`;
+                frame++;
+            } else {
+                drawPlayer();
+            }
+
+            // آپدیت ذرات
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            if (gameRunning || particles.length > 0) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        // رسم اولیه
+        resize();
+        drawRoad();
+        drawPlayer();
+    </script>
+</body>
+
+</html>
