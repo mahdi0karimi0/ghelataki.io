@@ -43,6 +43,8 @@
             pointer-events: auto;
             box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
             transition: opacity 0.5s;
+            max-width: 95%;
+            width: 500px;
         }
         
         h1 {
@@ -57,6 +59,7 @@
             gap: 15px;
             justify-content: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .char-card {
@@ -111,6 +114,10 @@
             pointer-events: auto;
         }
         
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+        
         #score-display {
             position: absolute;
             top: 20px;
@@ -121,10 +128,10 @@
             text-shadow: 0 0 10px #fff;
             pointer-events: none;
             display: none;
+            z-index: 100;
         }
         
         #game-over {
-            /* display: none;  ← این خط را کاملاً حذف کنید */
             background: rgba(0, 0, 0, 0.9);
             padding: 40px;
             border-radius: 20px;
@@ -132,6 +139,8 @@
             text-align: center;
             pointer-events: auto;
             box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+            max-width: 90%;
+            width: 350px;
         }
         
         #game-over h2 {
@@ -219,6 +228,11 @@
                     <div class="char-icon" id="amirreza-icon">در حال بارگیری...</div>
                     <div class="char-name">امیررضا</div>
                 </div>
+                <!-- پژو (کاراکتر جدید) -->
+                <div class="char-card" onclick="selectChar('pejoo')" style="color: #aa00ff;">
+                    <div class="char-icon" id="pejoo-icon">در حال بارگیری...</div>
+                    <div class="char-name">پژو</div>
+                </div>
             </div>
             <button id="start-btn" onclick="startGame()">شروع مسابقه</button>
         </div>
@@ -247,17 +261,19 @@
         let animationId;
         let selectedCharKey = 'amir';
 
-        // آماده‌سازی عکس‌ها
+        // آماده‌سازی عکس‌ها (پژو اضافه شد)
         const charImages = {
             amir: new Image(),
             mahdi: new Image(),
-            amirreza: new Image()
+            amirreza: new Image(),
+            pejoo: new Image() // ✅ کاراکتر جدید
         };
 
         // مسیر عکس‌ها
         charImages.amir.src = 'amir.jpg';
         charImages.mahdi.src = 'mahdi.jpg';
         charImages.amirreza.src = 'amirreza.jpg';
+        charImages.pejoo.src = 'pejoo.jpg'; // ✅ عکس پژو
 
         // نمایش پیام بارگیری عکس‌ها
         Object.keys(charImages).forEach(key => {
@@ -281,7 +297,7 @@
             };
         });
 
-        // تنظیمات شخصیت‌ها
+        // تنظیمات شخصیت‌ها (پژو اضافه شد)
         const characters = {
             'amir': {
                 name: 'امیرمحمد',
@@ -294,7 +310,11 @@
             'amirreza': {
                 name: 'امیررضا',
                 color: '#ff0055'
-            }
+            },
+            'pejoo': {
+                name: 'پژو',
+                color: '#aa00ff'
+            } // ✅ رنگ بنفش نئونی
         };
 
         // تنظیمات بازیکن
@@ -356,34 +376,23 @@
             animate();
         }
 
-        // 🔧 بازی مجدد فوری - نسخه کاملاً اصلاح‌شده
+        // بازی مجدد فوری
         function quickRestart() {
-            // توقف کامل انیمیشن قبلی
             cancelAnimationFrame(animationId);
-
-            // مخفی کردن صفحه باخت
             document.getElementById('game-over-layer').style.display = 'none';
-
-            // ریست کامل متغیرهای بازی
             gameRunning = true;
             score = 0;
             speed = 5;
             frame = 0;
             obstacles = [];
             particles = [];
-
-            // ریست موقعیت و وضعیت بازیکن
             player.lane = 1;
             player.color = characters[selectedCharKey].color;
             updatePlayerTargetX();
             player.x = player.targetX;
-
-            // نمایش مجدد نمایشگر امتیاز
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.style.display = 'block';
             scoreDisplay.innerText = `امتیاز: 0`;
-
-            // شروع مجدد حلقه بازی
             animate();
         }
 
@@ -422,7 +431,7 @@
             passive: false
         });
 
-        // کنترل‌های کیبورد (برای تست روی دسکتاپ)
+        // کنترل‌های کیبورد
         window.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
             if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
@@ -476,7 +485,7 @@
                 this.x += this.speedX;
                 this.y += this.speedY;
                 this.life -= this.decay;
-                this.speedY += 0.1; // گرانش کوچک
+                this.speedY += 0.1;
             }
             draw() {
                 ctx.globalAlpha = this.life;
@@ -513,10 +522,8 @@
         }
 
         function drawPlayer() {
-            // حرکت نرم به سمت لاین هدف
             player.x += (player.targetX - player.x) * 0.2;
 
-            // رسم عکس شخصیت
             const img = charImages[selectedCharKey];
             if (img && img.complete && img.naturalWidth !== 0) {
                 ctx.save();
@@ -531,7 +538,6 @@
                 );
                 ctx.restore();
             } else {
-                // پس‌زمینه برای وقتی عکس بارگیری نشده
                 ctx.save();
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = player.color;
@@ -558,14 +564,8 @@
         function draw() {
             ctx.clearRect(0, 0, width, height);
             drawRoad();
-
-            // رسم موانع
             obstacles.forEach(obs => obs.draw());
-
-            // رسم بازیکن
             drawPlayer();
-
-            // رسم ذرات
             particles.forEach(p => p.draw());
         }
 
@@ -576,18 +576,15 @@
             drawRoad();
 
             if (gameRunning) {
-                // تولید موانع جدید
                 if (frame % Math.max(30, 90 - Math.floor(score / 50)) === 0) {
                     obstacles.push(new Obstacle());
                     score += 10;
                 }
 
-                // افزایش تدریجی سرعت
                 if (frame % 300 === 0 && speed < 15) {
                     speed += 0.3;
                 }
 
-                // آپدیت و رسم موانع
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     let obs = obstacles[i];
                     obs.update();
@@ -612,7 +609,6 @@
                 drawPlayer();
             }
 
-            // آپدیت و رسم ذرات انفجار
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.update();
@@ -625,7 +621,6 @@
             }
         }
 
-        // رسم اولیه برای پیش‌نمایش
         resize();
         drawRoad();
         drawPlayer();
