@@ -214,7 +214,6 @@
                 transform: translateX(10px);
             }
         }
-        /* افکت لرزش صفحه هنگام تصادف */
         
         .screen-shake {
             animation: screenShake 0.3s ease-in-out;
@@ -253,6 +252,36 @@
                 transform: translate(-5px, -5px);
             }
         }
+        /* 🔊 دکمه کنترل صدا */
+        
+        #sound-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00f2ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            pointer-events: auto;
+        }
+        
+        #sound-control:hover {
+            background: rgba(0, 242, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        #sound-control.muted {
+            border-color: #ff0055;
+            opacity: 0.5;
+        }
     </style>
 </head>
 
@@ -261,11 +290,17 @@
     <canvas id="gameCanvas"></canvas>
     <div id="score-display">امتیاز: 0</div>
 
+    <!-- 🔊 دکمه کنترل صدا -->
+    <button id="sound-control" onclick="toggleSound()" title="قطع/وصل صدا">🔊</button>
+
+    <!-- 🎵 موسیقی پس‌زمینه -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="bg-music.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- 🔊 صدای تصادف -->
     <audio id="crash-sound" preload="auto">
         <source src="crash.mp3" type="audio/mpeg">
-        <!-- صدای جایگزین اگر فایل نبود -->
-        Your browser does not support the audio element.
     </audio>
 
     <!-- منوی انتخاب شخصیت -->
@@ -312,7 +347,9 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const bgMusic = document.getElementById('bg-music');
         const crashSound = document.getElementById('crash-sound');
+        const soundControl = document.getElementById('sound-control');
 
         let width, height;
         let gameRunning = false;
@@ -321,6 +358,7 @@
         let frame = 0;
         let animationId;
         let selectedCharKey = 'amir';
+        let soundEnabled = true; // وضعیت صدا
 
         // آماده‌سازی عکس‌ها
         const charImages = {
@@ -390,7 +428,7 @@
 
         let obstacles = [];
         let particles = [];
-        let shockwave = null; // موج ضربه برای افکت خرد شدن
+        let shockwave = null;
 
         function resize() {
             width = window.innerWidth;
@@ -420,10 +458,46 @@
             selectedCard.style.boxShadow = `0 0 15px ${characters[key].color}`;
         }
 
+        // 🔊 کنترل قطع/وصل صدا
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+
+            if (soundEnabled) {
+                soundControl.innerHTML = '🔊';
+                soundControl.classList.remove('muted');
+                if (gameRunning) {
+                    bgMusic.volume = 0.3;
+                    bgMusic.play().catch(e => console.log(e));
+                }
+            } else {
+                soundControl.innerHTML = '🔇';
+                soundControl.classList.add('muted');
+                bgMusic.pause();
+            }
+        }
+
+        // 🎵 شروع موسیقی پس‌زمینه
+        function startBackgroundMusic() {
+            if (soundEnabled) {
+                bgMusic.volume = 0.3; // حجم ملایم برای موسیقی پس‌زمینه
+                bgMusic.loop = true;
+                bgMusic.play().catch(e => {
+                    console.log('پخش موسیقی نیاز به تعامل کاربر دارد:', e);
+                });
+            }
+        }
+
+        // ⏹️ توقف موسیقی پس‌زمینه
+        function stopBackgroundMusic() {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }
+
         function startGame() {
-            // 🔊 فعال‌سازی صدا با اولین تعامل کاربر
-            crashSound.volume = 0.5;
+            // 🔊 بارگیری و پخش موسیقی
+            bgMusic.load();
             crashSound.load();
+            startBackgroundMusic();
 
             document.getElementById('menu-layer').style.display = 'none';
             document.getElementById('score-display').style.display = 'block';
@@ -447,6 +521,10 @@
             cancelAnimationFrame(animationId);
             document.getElementById('game-over-layer').style.display = 'none';
             document.body.classList.remove('screen-shake');
+
+            // 🎵 پخش مجدد موسیقی پس‌زمینه
+            startBackgroundMusic();
+
             gameRunning = true;
             score = 0;
             speed = 5;
@@ -468,12 +546,18 @@
             gameRunning = false;
             cancelAnimationFrame(animationId);
 
+            // ⏹️ توقف موسیقی پس‌زمینه
+            stopBackgroundMusic();
+
             // 🔊 پخش صدای تصادف
-            try {
-                crashSound.currentTime = 0;
-                crashSound.play().catch(e => console.log('صدا پخش نشد:', e));
-            } catch (e) {
-                console.log('خطا در پخش صدا:', e);
+            if (soundEnabled) {
+                try {
+                    crashSound.currentTime = 0;
+                    crashSound.volume = 0.5;
+                    crashSound.play().catch(e => console.log('صدا پخش نشد:', e));
+                } catch (e) {
+                    console.log('خطا در پخش صدا:', e);
+                }
             }
 
             // 💥 افکت لرزش صفحه
@@ -486,7 +570,7 @@
             document.getElementById('game-over-layer').style.display = 'flex';
             document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)}`;
 
-            // 💥 ایجاد افکت خرد شدن پیشرفته
+            // 💥 ایجاد افکت خرد شدن
             createShatterEffect(player.x, player.y, characters[selectedCharKey].color);
             draw();
         }
@@ -555,7 +639,7 @@
             }
         }
 
-        // 💥 کلاس ذرات خرد شدن کاراکتر (پیشرفته)
+        // 💥 کلاس ذرات خرد شدن کاراکتر
         class ShatterParticle {
             constructor(x, y, color, isPlayerPiece = false) {
                 this.x = x;
@@ -563,7 +647,6 @@
                 this.color = color;
                 this.isPlayerPiece = isPlayerPiece;
 
-                // اندازه متفاوت برای تکه‌های کاراکتر
                 if (isPlayerPiece) {
                     this.size = Math.random() * 15 + 8;
                     this.speedX = (Math.random() - 0.5) * 20;
@@ -586,8 +669,8 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                this.speedY += this.gravity; // گرانش
-                this.speedX *= 0.98; // مقاومت هوا
+                this.speedY += this.gravity;
+                this.speedX *= 0.98;
                 this.rotation += this.rotationSpeed;
                 this.life -= this.decay;
             }
@@ -599,7 +682,6 @@
                 ctx.rotate(this.rotation);
 
                 if (this.isPlayerPiece) {
-                    // تکه‌های کاراکتر به شکل مثلث/چندضلعی
                     ctx.fillStyle = this.color;
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = this.color;
@@ -610,7 +692,6 @@
                     ctx.closePath();
                     ctx.fill();
                 } else {
-                    // ذرات معمولی
                     ctx.fillStyle = this.color;
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size, 0, Math.PI * 2);
@@ -623,7 +704,7 @@
             }
         }
 
-        // 💥 موج ضربه (Shockwave)
+        // 💥 موج ضربه
         class Shockwave {
             constructor(x, y, color) {
                 this.x = x;
@@ -657,56 +738,17 @@
             }
         }
 
-        // 💥 افکت خرد شدن پیشرفته کاراکتر
         function createShatterEffect(x, y, color) {
-            // تکه‌های بزرگ کاراکتر (20 تکه)
             for (let i = 0; i < 20; i++) {
                 particles.push(new ShatterParticle(x, y, color, true));
             }
-
-            // ذرات ریز (50 تکه)
             for (let i = 0; i < 50; i++) {
                 particles.push(new ShatterParticle(x, y, color, false));
             }
-
-            // موج ضربه
             shockwave = new Shockwave(x, y, color);
 
-            // فلش سفید صفحه
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.fillRect(0, 0, width, height);
-        }
-
-        // کلاس ذرات انفجار معمولی (برای سازگاری)
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = (Math.random() - 0.5) * 10;
-                this.speedY = (Math.random() - 0.5) * 10;
-                this.life = 1;
-                this.decay = 0.015 + Math.random() * 0.01;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.life -= this.decay;
-                this.speedY += 0.1;
-            }
-            draw() {
-                ctx.globalAlpha = this.life;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        }
-
-        function createExplosion(x, y, color) {
-            createShatterEffect(x, y, color);
         }
 
         function drawRoad() {
@@ -814,7 +856,6 @@
                 frame++;
             }
 
-            // آپدیت و رسم ذرات خرد شدن
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.update();
@@ -822,7 +863,6 @@
                 if (p.life <= 0) particles.splice(i, 1);
             }
 
-            // آپدیت و رسم موج ضربه
             if (shockwave) {
                 shockwave.update();
                 shockwave.draw();
