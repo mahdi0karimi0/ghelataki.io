@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- ✅ جلوگیری از زوم شدن صفحه در موبایل -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مسابقه دوچرخه‌سواری نئونی</title>
     <style>
@@ -11,8 +12,10 @@
             overflow: hidden;
             background: #050510;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* ✅ جلوگیری از انتخاب متن و رفتارهای پیش‌فرض لمسی */
             touch-action: none;
             user-select: none;
+            -webkit-user-select: none;
         }
         
         canvas {
@@ -126,15 +129,19 @@
             font-size: 1.5rem;
             font-weight: bold;
             text-shadow: 0 0 10px #fff;
+            /* ✅ فعال کردن کلیک و لمس */
             pointer-events: auto;
             display: none;
             z-index: 100;
             cursor: pointer;
             transition: all 0.2s;
+            /* ✅ جلوگیری از هایلایت شدن در موبایل */
+            -webkit-tap-highlight-color: transparent;
         }
 
         #score-display:active {
             transform: scale(0.95);
+            opacity: 0.8;
         }
 
         /* 🔮 نشانگر حالت مخفی */
@@ -278,28 +285,40 @@
             90% { transform: translate(-5px, -5px); }
         }
 
-        #sound-control {
+        /* ✅ دکمه‌های کنترل - بهینه برای موبایل */
+        .control-btn {
             position: absolute;
             top: 20px;
-            right: 20px;
             z-index: 100;
             background: rgba(0, 0, 0, 0.5);
-            border: 2px solid #00f2ff;
             border-radius: 50%;
             width: 50px;
             height: 50px;
             cursor: pointer;
-            display: flex;
+            display: none; /* پیش‌فرض مخفی */
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             transition: all 0.3s;
             pointer-events: auto;
+            /* ✅ جلوگیری از تاخیر لمس */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            border: 2px solid #fff;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #sound-control {
+            right: 20px;
+            border-color: #00f2ff;
         }
 
         #sound-control:hover {
             background: rgba(0, 242, 255, 0.3);
-            transform: scale(1.1);
         }
 
         #sound-control.muted {
@@ -308,27 +327,12 @@
         }
 
         #pause-control {
-            position: absolute;
-            top: 20px;
             right: 80px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid #00ff66;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            transition: all 0.3s;
-            pointer-events: auto;
+            border-color: #00ff66;
         }
 
         #pause-control:hover {
             background: rgba(0, 255, 102, 0.3);
-            transform: scale(1.1);
         }
 
         #pause-control.paused {
@@ -390,6 +394,7 @@
             cursor: pointer;
             font-family: inherit;
             transition: all 0.3s;
+            pointer-events: auto;
         }
 
         #resume-btn {
@@ -398,9 +403,8 @@
             box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
         }
 
-        #resume-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 255, 102, 0.6);
+        #resume-btn:active {
+            transform: scale(0.95);
         }
 
         #quit-btn {
@@ -409,9 +413,8 @@
             box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
         }
 
-        #quit-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+        #quit-btn:active {
+            transform: scale(0.95);
         }
 
         .shortcut-hint {
@@ -424,7 +427,6 @@
             pointer-events: none;
         }
 
-        /* 💜 افکت حالت شکست‌ناپذیر */
         .god-mode-player {
             filter: drop-shadow(0 0 20px #aa00ff) drop-shadow(0 0 40px #aa00ff);
         }
@@ -439,8 +441,9 @@
     <div id="speed-display">سرعت: 1x</div>
     <div id="speed-up-notify">⚡ سرعت!</div>
 
-    <button id="pause-control" onclick="togglePause()" title="توقف/ادامه">⏸️</button>
-    <button id="sound-control" onclick="toggleSound()" title="قطع/وصل صدا">🔊</button>
+    <!-- ✅ کلاس control-btn اضافه شد -->
+    <button id="pause-control" class="control-btn" title="توقف/ادامه">⏸️</button>
+    <button id="sound-control" class="control-btn" title="قطع/وصل صدا">🔊</button>
 
     <audio id="bg-music" loop preload="auto">
         <source src="bg-music.mp3" type="audio/mpeg">
@@ -608,6 +611,7 @@
             selectedCard.style.boxShadow = `0 0 15px ${characters[key].color}`;
         }
 
+        // ✅ توابع کنترل با پشتیبانی کامل لمسی
         function toggleSound() {
             soundEnabled = !soundEnabled;
             
@@ -698,18 +702,20 @@
             
             if (godMode) {
                 godModeIndicator.style.display = 'block';
-                console.log('💜 God Mode Activated!');
+                scoreDisplay.style.textShadow = '0 0 20px #aa00ff';
             } else {
                 godModeIndicator.style.display = 'none';
-                console.log('💜 God Mode Deactivated!');
+                scoreDisplay.style.textShadow = '0 0 10px #fff';
             }
         }
 
         // 🔮 بررسی کلیک‌های مخفی روی امتیاز
-        function checkSecretClick() {
+        function checkSecretClick(e) {
+            // ✅ جلوگیری از رفتار پیش‌فرض لمس
+            if (e) e.preventDefault();
+            
             godModeClicks++;
             
-            // ریست تایمر اگر فاصله کلیک‌ها زیاد شود
             if (godModeClickTimer) {
                 clearTimeout(godModeClickTimer);
             }
@@ -718,13 +724,9 @@
                 godModeClicks = 0;
             }, 1000);
             
-            // اگر ۵ کلیک در ۱ ثانیه انجام شد
             if (godModeClicks >= 5) {
                 toggleGodMode();
                 godModeClicks = 0;
-                
-                // افکت بصری برای فعال‌سازی
-                scoreDisplay.style.textShadow = godMode ? '0 0 20px #aa00ff' : '0 0 10px #fff';
             }
         }
 
@@ -752,8 +754,8 @@
             scoreDisplay.style.display = 'block';
             speedDisplay.style.display = 'block';
             pauseControl.style.display = 'flex';
+            soundControl.style.display = 'flex';
             
-            // ریست حالت مخفی
             godMode = false;
             godModeIndicator.style.display = 'none';
             scoreDisplay.style.textShadow = '0 0 10px #fff';
@@ -787,7 +789,6 @@
             
             startBackgroundMusic();
             
-            // ریست حالت مخفی
             godMode = false;
             godModeIndicator.style.display = 'none';
             scoreDisplay.style.textShadow = '0 0 10px #fff';
@@ -809,6 +810,7 @@
             scoreDisplay.style.display = 'block';
             speedDisplay.style.display = 'block';
             pauseControl.style.display = 'flex';
+            soundControl.style.display = 'flex';
             speedDisplay.innerText = `سرعت: ${speedLevel}x`;
             scoreDisplay.innerText = `امتیاز: 0`;
             pauseControl.innerHTML = '⏸️';
@@ -817,9 +819,7 @@
         }
 
         function gameOver() {
-            // 🔮 اگر حالت شکست‌ناپذیر فعال است، نباخت!
             if (godMode) {
-                // فقط موانع را رد کن بدون باختن
                 return;
             }
             
@@ -845,6 +845,7 @@
             }, 500);
             
             pauseControl.style.display = 'none';
+            soundControl.style.display = 'none';
             document.getElementById('game-over-layer').style.display = 'flex';
             document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)} | سرعت: ${speedLevel}x`;
             
@@ -869,14 +870,39 @@
             player.targetX = (player.lane * laneWidth) + (laneWidth / 2);
         }
 
-        // 🔮 کلیک مخفی روی امتیاز
-        scoreDisplay.addEventListener('click', () => {
-            if (gameRunning) {
-                checkSecretClick();
-            }
+        // ✅ رویدادهای لمسی برای امتیاز (حالت مخفی)
+        scoreDisplay.addEventListener('click', (e) => {
+            if (gameRunning) checkSecretClick(e);
         });
+        scoreDisplay.addEventListener('touchstart', (e) => {
+            if (gameRunning) checkSecretClick(e);
+        }, { passive: false });
 
+        // ✅ رویدادهای لمسی برای دکمه صدا
+        soundControl.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSound();
+        });
+        soundControl.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleSound();
+        }, { passive: false });
+
+        // ✅ رویدادهای لمسی برای دکمه توقف
+        pauseControl.addEventListener('click', (e) => {
+            e.preventDefault();
+            togglePause();
+        });
+        pauseControl.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            togglePause();
+        }, { passive: false });
+
+        // کنترل‌های حرکت بازی
         window.addEventListener('touchstart', (e) => {
+            // ✅ اگر روی دکمه‌ها لمس شد، حرکت نکند
+            if (e.target.closest('.control-btn') || e.target.closest('#score-display')) return;
+            
             if (!gameRunning || gamePaused) return;
             e.preventDefault();
             const touchX = e.touches[0].clientX;
@@ -892,7 +918,6 @@
                 }
             }
             
-            // 🔮 کلید میانبر مخفی جایگزین: Ctrl+Shift+G
             if (e.ctrlKey && e.shiftKey && (e.key === 'g' || e.key === 'G')) {
                 if (gameRunning) {
                     toggleGodMode();
@@ -1070,7 +1095,6 @@
             
             ctx.save();
             
-            // 🔮 افکت حالت شکست‌ناپذیر
             if (godMode) {
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = '#aa00ff';
@@ -1142,9 +1166,8 @@
                     if (checkCollision(obs)) {
                         gameOver();
                         if (godMode) {
-                            // 🔮 در حالت شکست‌ناپذیر، مانع را حذف کن و ادامه بده
                             obstacles.splice(i, 1);
-                            score += 5; // امتیاز کمتر برای عبور از مانع
+                            score += 5;
                         } else {
                             return;
                         }
