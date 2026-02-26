@@ -130,6 +130,46 @@
             display: none;
             z-index: 100;
         }
+
+        /* 🚀 نمایشگر سرعت */
+        #speed-display {
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            color: #ffaa00;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffaa00;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+        }
+
+        /* ⚡ اعلان افزایش سرعت */
+        #speed-up-notify {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffaa00;
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ffaa00;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        #speed-up-notify.show {
+            animation: speedUpFlash 1s ease-out;
+        }
+
+        @keyframes speedUpFlash {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
         
         #game-over {
             background: rgba(0, 0, 0, 0.9);
@@ -189,30 +229,15 @@
         }
         
         @keyframes popIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-10px);
-            }
-            75% {
-                transform: translateX(10px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
         
         .screen-shake {
@@ -220,40 +245,19 @@
         }
         
         @keyframes screenShake {
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-            10% {
-                transform: translate(-5px, -5px);
-            }
-            20% {
-                transform: translate(5px, 5px);
-            }
-            30% {
-                transform: translate(-5px, 5px);
-            }
-            40% {
-                transform: translate(5px, -5px);
-            }
-            50% {
-                transform: translate(-5px, -5px);
-            }
-            60% {
-                transform: translate(5px, 5px);
-            }
-            70% {
-                transform: translate(-5px, 5px);
-            }
-            80% {
-                transform: translate(5px, -5px);
-            }
-            90% {
-                transform: translate(-5px, -5px);
-            }
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, 5px); }
+            30% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            50% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            70% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            90% { transform: translate(-5px, -5px); }
         }
+
         /* 🔊 دکمه کنترل صدا */
-        
         #sound-control {
             position: absolute;
             top: 20px;
@@ -272,12 +276,12 @@
             transition: all 0.3s;
             pointer-events: auto;
         }
-        
+
         #sound-control:hover {
             background: rgba(0, 242, 255, 0.3);
             transform: scale(1.1);
         }
-        
+
         #sound-control.muted {
             border-color: #ff0055;
             opacity: 0.5;
@@ -289,6 +293,8 @@
 
     <canvas id="gameCanvas"></canvas>
     <div id="score-display">امتیاز: 0</div>
+    <div id="speed-display">سرعت: 1x</div>
+    <div id="speed-up-notify">⚡ سرعت!</div>
 
     <!-- 🔊 دکمه کنترل صدا -->
     <button id="sound-control" onclick="toggleSound()" title="قطع/وصل صدا">🔊</button>
@@ -350,15 +356,20 @@
         const bgMusic = document.getElementById('bg-music');
         const crashSound = document.getElementById('crash-sound');
         const soundControl = document.getElementById('sound-control');
+        const speedDisplay = document.getElementById('speed-display');
+        const speedUpNotify = document.getElementById('speed-up-notify');
 
         let width, height;
         let gameRunning = false;
         let score = 0;
         let speed = 5;
+        let baseSpeed = 5;
+        let speedLevel = 1;
         let frame = 0;
         let animationId;
         let selectedCharKey = 'amir';
-        let soundEnabled = true; // وضعیت صدا
+        let soundEnabled = true;
+        let lastSpeedUpFrame = 0;
 
         // آماده‌سازی عکس‌ها
         const charImages = {
@@ -397,22 +408,10 @@
 
         // تنظیمات شخصیت‌ها
         const characters = {
-            'amir': {
-                name: 'امیرمحمد',
-                color: '#00f2ff'
-            },
-            'mahdi': {
-                name: 'مهدی',
-                color: '#00ff66'
-            },
-            'amirreza': {
-                name: 'امیررضا',
-                color: '#ff0055'
-            },
-            'pejoo': {
-                name: 'پژو',
-                color: '#aa00ff'
-            }
+            'amir': { name: 'امیرمحمد', color: '#00f2ff' },
+            'mahdi': { name: 'مهدی', color: '#00ff66' },
+            'amirreza': { name: 'امیررضا', color: '#ff0055' },
+            'pejoo': { name: 'پژو', color: '#aa00ff' }
         };
 
         // تنظیمات بازیکن
@@ -451,7 +450,7 @@
                 card.style.borderColor = '#333';
                 card.style.boxShadow = 'none';
             });
-
+            
             const selectedCard = event.currentTarget;
             selectedCard.classList.add('selected');
             selectedCard.style.borderColor = characters[key].color;
@@ -461,7 +460,7 @@
         // 🔊 کنترل قطع/وصل صدا
         function toggleSound() {
             soundEnabled = !soundEnabled;
-
+            
             if (soundEnabled) {
                 soundControl.innerHTML = '🔊';
                 soundControl.classList.remove('muted');
@@ -479,7 +478,7 @@
         // 🎵 شروع موسیقی پس‌زمینه
         function startBackgroundMusic() {
             if (soundEnabled) {
-                bgMusic.volume = 0.3; // حجم ملایم برای موسیقی پس‌زمینه
+                bgMusic.volume = 0.3;
                 bgMusic.loop = true;
                 bgMusic.play().catch(e => {
                     console.log('پخش موسیقی نیاز به تعامل کاربر دارد:', e);
@@ -493,26 +492,53 @@
             bgMusic.currentTime = 0;
         }
 
+        // 🚀 افزایش سرعت بازی
+        function increaseSpeed() {
+            const now = frame;
+            
+            // هر 200 فریم سرعت افزایش می‌یابد
+            if (now - lastSpeedUpFrame >= 200 && speedLevel < 10) {
+                speed += 0.8;
+                speedLevel++;
+                lastSpeedUpFrame = now;
+                
+                // نمایش اعلان افزایش سرعت
+                speedDisplay.innerText = `سرعت: ${speedLevel}x`;
+                speedUpNotify.classList.remove('show');
+                void speedUpNotify.offsetWidth; // ریست انیمیشن
+                speedUpNotify.classList.add('show');
+                
+                // تغییر رنگ موسیقی (اگر پشتیبانی شود)
+                if (soundEnabled && bgMusic.playbackRate) {
+                    bgMusic.playbackRate = Math.min(1 + (speedLevel - 1) * 0.1, 2);
+                }
+            }
+        }
+
         function startGame() {
-            // 🔊 بارگیری و پخش موسیقی
             bgMusic.load();
             crashSound.load();
             startBackgroundMusic();
-
+            
             document.getElementById('menu-layer').style.display = 'none';
             document.getElementById('score-display').style.display = 'block';
+            speedDisplay.style.display = 'block';
             gameRunning = true;
             score = 0;
-            speed = 5;
+            speed = baseSpeed;
+            speedLevel = 1;
             frame = 0;
+            lastSpeedUpFrame = 0;
             obstacles = [];
             particles = [];
             shockwave = null;
-
+            
             player.lane = 1;
             updatePlayerTargetX();
             player.x = player.targetX;
-
+            
+            speedDisplay.innerText = `سرعت: ${speedLevel}x`;
+            
             animate();
         }
 
@@ -521,14 +547,15 @@
             cancelAnimationFrame(animationId);
             document.getElementById('game-over-layer').style.display = 'none';
             document.body.classList.remove('screen-shake');
-
-            // 🎵 پخش مجدد موسیقی پس‌زمینه
+            
             startBackgroundMusic();
-
+            
             gameRunning = true;
             score = 0;
-            speed = 5;
+            speed = baseSpeed;
+            speedLevel = 1;
             frame = 0;
+            lastSpeedUpFrame = 0;
             obstacles = [];
             particles = [];
             shockwave = null;
@@ -538,6 +565,8 @@
             player.x = player.targetX;
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.style.display = 'block';
+            speedDisplay.style.display = 'block';
+            speedDisplay.innerText = `سرعت: ${speedLevel}x`;
             scoreDisplay.innerText = `امتیاز: 0`;
             animate();
         }
@@ -545,32 +574,27 @@
         function gameOver() {
             gameRunning = false;
             cancelAnimationFrame(animationId);
-
-            // ⏹️ توقف موسیقی پس‌زمینه
+            
             stopBackgroundMusic();
-
-            // 🔊 پخش صدای تصادف
+            
             if (soundEnabled) {
                 try {
                     crashSound.currentTime = 0;
                     crashSound.volume = 0.5;
                     crashSound.play().catch(e => console.log('صدا پخش نشد:', e));
-                } catch (e) {
+                } catch(e) {
                     console.log('خطا در پخش صدا:', e);
                 }
             }
-
-            // 💥 افکت لرزش صفحه
+            
             document.body.classList.add('screen-shake');
             setTimeout(() => {
                 document.body.classList.remove('screen-shake');
             }, 500);
-
-            // نمایش صفحه باخت
+            
             document.getElementById('game-over-layer').style.display = 'flex';
-            document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)}`;
-
-            // 💥 ایجاد افکت خرد شدن
+            document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)} | سرعت: ${speedLevel}x`;
+            
             createShatterEffect(player.x, player.y, characters[selectedCharKey].color);
             draw();
         }
@@ -597,9 +621,7 @@
             const touchX = e.touches[0].clientX;
             if (touchX < width / 2) moveLeft();
             else moveRight();
-        }, {
-            passive: false
-        });
+        }, { passive: false });
 
         // کنترل‌های کیبورد
         window.addEventListener('keydown', (e) => {
@@ -646,7 +668,7 @@
                 this.y = y;
                 this.color = color;
                 this.isPlayerPiece = isPlayerPiece;
-
+                
                 if (isPlayerPiece) {
                     this.size = Math.random() * 15 + 8;
                     this.speedX = (Math.random() - 0.5) * 20;
@@ -660,12 +682,12 @@
                     this.rotation = 0;
                     this.rotationSpeed = 0;
                 }
-
+                
                 this.life = 1;
                 this.decay = isPlayerPiece ? 0.008 + Math.random() * 0.005 : 0.015 + Math.random() * 0.01;
                 this.gravity = 0.3;
             }
-
+            
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -674,13 +696,13 @@
                 this.rotation += this.rotationSpeed;
                 this.life -= this.decay;
             }
-
+            
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.life;
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
-
+                
                 if (this.isPlayerPiece) {
                     ctx.fillStyle = this.color;
                     ctx.shadowBlur = 10;
@@ -697,7 +719,7 @@
                     ctx.arc(0, 0, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
-
+                
                 ctx.restore();
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
@@ -715,12 +737,12 @@
                 this.speed = 15;
                 this.opacity = 1;
             }
-
+            
             update() {
                 this.radius += this.speed;
                 this.opacity = 1 - (this.radius / this.maxRadius);
             }
-
+            
             draw() {
                 if (this.opacity <= 0) return;
                 ctx.save();
@@ -746,7 +768,7 @@
                 particles.push(new ShatterParticle(x, y, color, false));
             }
             shockwave = new Shockwave(x, y, color);
-
+            
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.fillRect(0, 0, width, height);
         }
@@ -805,8 +827,8 @@
         function checkCollision(obs) {
             const dx = Math.abs(player.x - obs.x);
             const dy = Math.abs(player.y - obs.y);
-            return (dx < (player.width / 2 + obs.width / 2 - 15) &&
-                dy < (player.height / 2 + obs.height / 2 - 15));
+            return (dx < (player.width / 2 + obs.width / 2 - 15) && 
+                    dy < (player.height / 2 + obs.height / 2 - 15));
         }
 
         function draw() {
@@ -825,13 +847,14 @@
             drawRoad();
 
             if (gameRunning) {
-                if (frame % Math.max(30, 90 - Math.floor(score / 50)) === 0) {
+                // 🚀 افزایش سرعت بازی
+                increaseSpeed();
+                
+                // تولید موانع (با افزایش سرعت، موانع بیشتر می‌شوند)
+                const obstacleInterval = Math.max(20, 60 - speedLevel * 5);
+                if (frame % obstacleInterval === 0) {
                     obstacles.push(new Obstacle());
                     score += 10;
-                }
-
-                if (frame % 300 === 0 && speed < 15) {
-                    speed += 0.3;
                 }
 
                 for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -851,7 +874,7 @@
                 }
 
                 drawPlayer();
-                score += 0.15;
+                score += 0.15 * speedLevel;
                 document.getElementById('score-display').innerText = `امتیاز: ${Math.floor(score)}`;
                 frame++;
             }
@@ -862,7 +885,7 @@
                 p.draw();
                 if (p.life <= 0) particles.splice(i, 1);
             }
-
+            
             if (shockwave) {
                 shockwave.update();
                 shockwave.draw();
