@@ -1,29 +1,29 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
-    <!-- ✅ جلوگیری از زوم شدن صفحه در موبایل -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مسابقه دوچرخه‌سواری نئونی</title>
+
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background: #050510;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* ✅ جلوگیری از انتخاب متن و رفتارهای پیش‌فرض لمسی */
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
         }
-        
+
         canvas {
             display: block;
             width: 100%;
             height: 100%;
         }
-        
+
         .ui-layer {
             position: absolute;
             top: 0;
@@ -36,7 +36,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         #character-select {
             background: rgba(0, 0, 0, 0.9);
             padding: 30px;
@@ -48,15 +48,16 @@
             transition: opacity 0.5s;
             max-width: 95%;
             width: 500px;
+            box-sizing: border-box;
         }
-        
+
         h1 {
             color: #fff;
             margin-bottom: 20px;
             text-shadow: 0 0 10px #fff;
             font-size: 1.8rem;
         }
-        
+
         .char-container {
             display: flex;
             gap: 15px;
@@ -64,7 +65,7 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
+
         .char-card {
             background: #1a1a2e;
             border: 2px solid #333;
@@ -73,22 +74,23 @@
             cursor: pointer;
             transition: all 0.3s;
             width: 100px;
+            box-sizing: border-box;
         }
-        
+
         .char-card:hover,
         .char-card.selected {
             transform: translateY(-5px);
             box-shadow: 0 0 15px currentColor;
             border-color: currentColor;
         }
-        
+
         .char-name {
             color: #fff;
             font-size: 0.9rem;
             margin-top: 10px;
             font-weight: bold;
         }
-        
+
         .char-icon {
             width: 80px;
             height: 80px;
@@ -102,8 +104,10 @@
             justify-content: center;
             color: #aaa;
             font-size: 0.7rem;
+            background-position: center;
+            background-size: cover;
         }
-        
+
         #start-btn {
             background: linear-gradient(45deg, #00f2ff, #0066ff);
             border: none;
@@ -116,11 +120,11 @@
             font-family: inherit;
             pointer-events: auto;
         }
-        
+
         #start-btn:active {
             transform: scale(0.95);
         }
-        
+
         #score-display {
             position: absolute;
             top: 20px;
@@ -129,22 +133,19 @@
             font-size: 1.5rem;
             font-weight: bold;
             text-shadow: 0 0 10px #fff;
-            /* ✅ فعال کردن کلیک و لمس */
             pointer-events: auto;
             display: none;
             z-index: 100;
             cursor: pointer;
             transition: all 0.2s;
-            /* ✅ جلوگیری از هایلایت شدن در موبایل */
             -webkit-tap-highlight-color: transparent;
         }
-        
+
         #score-display:active {
             transform: scale(0.95);
             opacity: 0.8;
         }
-        /* 🔮 نشانگر حالت مخفی */
-        
+
         #god-mode-indicator {
             display: none;
             position: absolute;
@@ -155,10 +156,9 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         @keyframes godPulse {
-            0%,
-            100% {
+            0%, 100% {
                 opacity: 1;
                 transform: scale(1);
                 text-shadow: 0 0 10px #aa00ff;
@@ -169,7 +169,7 @@
                 text-shadow: 0 0 20px #aa00ff;
             }
         }
-        
+
         #speed-display {
             position: absolute;
             top: 20px;
@@ -182,7 +182,7 @@
             display: none;
             z-index: 100;
         }
-        
+
         #speed-up-notify {
             position: absolute;
             top: 50%;
@@ -197,11 +197,11 @@
             z-index: 100;
             transition: opacity 0.3s;
         }
-        
+
         #speed-up-notify.show {
             animation: speedUpFlash 1s ease-out;
         }
-        
+
         @keyframes speedUpFlash {
             0% {
                 opacity: 1;
@@ -215,7 +215,7 @@
                 transform: translate(-50%, -50%) scale(1);
             }
         }
-        
+
         #game-over {
             background: rgba(0, 0, 0, 0.9);
             padding: 40px;
@@ -227,7 +227,7 @@
             max-width: 90%;
             width: 350px;
         }
-        
+
         #game-over h2 {
             color: #ff0055;
             font-size: 2.5rem;
@@ -235,13 +235,13 @@
             text-shadow: 0 0 15px #ff0055;
             animation: shake 0.5s ease-in-out;
         }
-        
+
         #final-score {
             color: #fff;
             font-size: 1.2rem;
             margin-bottom: 20px;
         }
-        
+
         .controls-hint {
             position: absolute;
             bottom: 20px;
@@ -251,7 +251,7 @@
             font-size: 0.9rem;
             pointer-events: none;
         }
-        
+
         #quick-restart {
             background: linear-gradient(45deg, #ff0055, #ff66cc);
             border: none;
@@ -268,77 +268,40 @@
             animation: popIn 0.3s ease-out;
             transition: transform 0.1s;
         }
-        
+
         #quick-restart:active {
             transform: scale(0.95);
         }
-        
+
         @keyframes popIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
-        
+
         @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-10px);
-            }
-            75% {
-                transform: translateX(10px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
-        
+
         .screen-shake {
             animation: screenShake 0.3s ease-in-out;
         }
-        
+
         @keyframes screenShake {
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-            10% {
-                transform: translate(-5px, -5px);
-            }
-            20% {
-                transform: translate(5px, 5px);
-            }
-            30% {
-                transform: translate(-5px, 5px);
-            }
-            40% {
-                transform: translate(5px, -5px);
-            }
-            50% {
-                transform: translate(-5px, -5px);
-            }
-            60% {
-                transform: translate(5px, 5px);
-            }
-            70% {
-                transform: translate(-5px, 5px);
-            }
-            80% {
-                transform: translate(5px, -5px);
-            }
-            90% {
-                transform: translate(-5px, -5px);
-            }
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, 5px); }
+            30% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            50% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            70% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            90% { transform: translate(-5px, -5px); }
         }
-        /* ✅ دکمه‌های کنترل - بهینه برای موبایل */
-        
+
         .control-btn {
             position: absolute;
             top: 20px;
@@ -349,61 +312,46 @@
             height: 50px;
             cursor: pointer;
             display: none;
-            /* پیش‌فرض مخفی */
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             transition: all 0.3s;
             pointer-events: auto;
-            /* ✅ جلوگیری از تاخیر لمس */
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             border: 2px solid #fff;
         }
-        
+
         .control-btn:active {
             transform: scale(0.9);
             background: rgba(255, 255, 255, 0.2);
         }
-        
+
         #sound-control {
             right: 20px;
             border-color: #00f2ff;
         }
-        
-        #sound-control:hover {
-            background: rgba(0, 242, 255, 0.3);
-        }
-        
+
         #sound-control.muted {
             border-color: #ff0055;
             opacity: 0.5;
         }
-        
+
         #pause-control {
             right: 80px;
             border-color: #00ff66;
         }
-        
-        #pause-control:hover {
-            background: rgba(0, 255, 102, 0.3);
-        }
-        
+
         #pause-control.paused {
             border-color: #ffaa00;
             animation: pulse 1s infinite;
         }
-        
+
         @keyframes pulse {
-            0%,
-            100% {
-                box-shadow: 0 0 10px #ffaa00;
-            }
-            50% {
-                box-shadow: 0 0 20px #ffaa00;
-            }
+            0%, 100% { box-shadow: 0 0 10px #ffaa00; }
+            50% { box-shadow: 0 0 20px #ffaa00; }
         }
-        
+
         #pause-screen {
             position: absolute;
             top: 0;
@@ -419,7 +367,7 @@
             pointer-events: auto;
             backdrop-filter: blur(5px);
         }
-        
+
         #pause-screen h2 {
             color: #ffaa00;
             font-size: 3rem;
@@ -427,29 +375,24 @@
             text-shadow: 0 0 20px #ffaa00;
             animation: pausePulse 1.5s infinite;
         }
-        
+
         @keyframes pausePulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
-        
+
         #pause-screen p {
             color: #fff;
             font-size: 1.2rem;
             margin-bottom: 40px;
             opacity: 0.7;
         }
-        
+
         .pause-btn-group {
             display: flex;
             gap: 20px;
         }
-        
+
         .pause-btn {
             padding: 15px 40px;
             font-size: 1.2rem;
@@ -460,27 +403,19 @@
             transition: all 0.3s;
             pointer-events: auto;
         }
-        
+
         #resume-btn {
             background: linear-gradient(45deg, #00ff66, #00cc55);
             color: #000;
             box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
         }
-        
-        #resume-btn:active {
-            transform: scale(0.95);
-        }
-        
+
         #quit-btn {
             background: linear-gradient(45deg, #ff0055, #ff66cc);
             color: #fff;
             box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
         }
-        
-        #quit-btn:active {
-            transform: scale(0.95);
-        }
-        
+
         .shortcut-hint {
             position: absolute;
             bottom: 60px;
@@ -490,9 +425,33 @@
             font-size: 0.85rem;
             pointer-events: none;
         }
-        
+
         .god-mode-player {
             filter: drop-shadow(0 0 20px #aa00ff) drop-shadow(0 0 40px #aa00ff);
+        }
+
+        @media (max-width: 480px) {
+            #character-select {
+                padding: 18px 10px;
+            }
+
+            .char-container {
+                gap: 8px;
+            }
+
+            .char-card {
+                width: 95px;
+                padding: 10px 5px;
+            }
+
+            .char-icon {
+                width: 65px;
+                height: 65px;
+            }
+
+            h1 {
+                font-size: 1.35rem;
+            }
         }
     </style>
 </head>
@@ -500,14 +459,17 @@
 <body>
 
     <canvas id="gameCanvas"></canvas>
+
     <div id="score-display">امتیاز: 0</div>
     <div id="god-mode-indicator">🔮</div>
     <div id="speed-display">سرعت: 1x</div>
     <div id="speed-up-notify">⚡ سرعت!</div>
 
-    <!-- ✅ کلاس control-btn اضافه شد -->
     <button id="pause-control" class="control-btn" title="توقف/ادامه">⏸️</button>
     <button id="sound-control" class="control-btn" title="قطع/وصل صدا">🔊</button>
+
+    <!-- انتخاب تصویر دلخواه -->
+    <input type="file" id="custom-image-input" accept="image/*" hidden>
 
     <audio id="bg-music" loop preload="auto">
         <source src="bg-music.mp3" type="audio/mpeg">
@@ -518,27 +480,47 @@
     </audio>
 
     <div class="ui-layer" id="menu-layer">
+
         <div id="character-select">
+
             <h1>قهرمان خود را انتخاب کنید</h1>
+
             <div class="char-container">
-                <div class="char-card selected" onclick="selectChar('amir')" style="color: #00f2ff;">
+
+                <div class="char-card selected" data-character="amir" onclick="selectChar('amir')" style="color: #00f2ff;">
                     <div class="char-icon" id="amir-icon">در حال بارگیری...</div>
                     <div class="char-name">امیرمحمد</div>
                 </div>
-                <div class="char-card" onclick="selectChar('mahdi')" style="color: #00ff66;">
+
+                <div class="char-card" data-character="mahdi" onclick="selectChar('mahdi')" style="color: #00ff66;">
                     <div class="char-icon" id="mahdi-icon">در حال بارگیری...</div>
                     <div class="char-name">مهدی</div>
                 </div>
-                <div class="char-card" onclick="selectChar('amirreza')" style="color: #ff0055;">
+
+                <div class="char-card" data-character="amirreza" onclick="selectChar('amirreza')" style="color: #ff0055;">
                     <div class="char-icon" id="amirreza-icon">در حال بارگیری...</div>
                     <div class="char-name">امیررضا</div>
                 </div>
-                <div class="char-card" onclick="selectChar('pejoo')" style="color: #aa00ff;">
+
+                <div class="char-card" data-character="pejoo" onclick="selectChar('pejoo')" style="color: #aa00ff;">
                     <div class="char-icon" id="pejoo-icon">در حال بارگیری...</div>
                     <div class="char-name">داریوش</div>
                 </div>
+
+                <div class="char-card" data-character="farhad" onclick="selectChar('farhad')" style="color: #ffaa00;">
+                    <div class="char-icon" id="farhad-icon">در حال بارگیری...</div>
+                    <div class="char-name">فرهاد</div>
+                </div>
+
+                <div class="char-card" data-character="custom" onclick="handleCustomCharacterClick()" style="color: #ff66cc;">
+                    <div class="char-icon" id="custom-icon">📷</div>
+                    <div class="char-name">عکس دلخواه</div>
+                </div>
+
             </div>
+
             <button id="start-btn" onclick="startGame()">شروع مسابقه</button>
+
         </div>
     </div>
 
@@ -565,6 +547,7 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
         const bgMusic = document.getElementById('bg-music');
         const crashSound = document.getElementById('crash-sound');
         const soundControl = document.getElementById('sound-control');
@@ -574,6 +557,7 @@
         const speedUpNotify = document.getElementById('speed-up-notify');
         const scoreDisplay = document.getElementById('score-display');
         const godModeIndicator = document.getElementById('god-mode-indicator');
+        const customImageInput = document.getElementById('custom-image-input');
 
         let width, height;
         let gameRunning = false;
@@ -588,36 +572,50 @@
         let soundEnabled = true;
         let lastSpeedUpFrame = 0;
 
-        // 🔮 حالت شکست‌ناپذیر مخفی
+        // حالت شکست‌ناپذیر مخفی
         let godMode = false;
         let godModeClicks = 0;
         let godModeClickTimer = null;
 
+        // تصاویر کاراکترها
         const charImages = {
             amir: new Image(),
             mahdi: new Image(),
             amirreza: new Image(),
-            pejoo: new Image()
+            pejoo: new Image(),
+            farhad: new Image(),
+            custom: new Image()
         };
 
         charImages.amir.src = 'amir.jpg';
         charImages.mahdi.src = 'mahdi.jpg';
         charImages.amirreza.src = 'amirreza.jpg';
         charImages.pejoo.src = 'pejoo.jpg';
+        charImages.farhad.src = 'farhad.jpg';
 
+        // آدرس موقت تصویر انتخابی کاربر
+        let customImageObjectUrl = null;
+
+        // بارگذاری تصاویر و نمایش پیش‌نمایش آن‌ها
         Object.keys(charImages).forEach(key => {
+
+            if (key === 'custom') return;
+
             charImages[key].onload = () => {
                 const icon = document.getElementById(`${key}-icon`);
+
                 if (icon) {
                     icon.innerHTML = '';
                     icon.style.background = 'none';
-                    icon.style.backgroundImage = `url(${charImages[key].src})`;
+                    icon.style.backgroundImage = `url("${charImages[key].src}")`;
                     icon.style.backgroundSize = 'cover';
                     icon.style.backgroundPosition = 'center';
                 }
             };
+
             charImages[key].onerror = () => {
                 const icon = document.getElementById(`${key}-icon`);
+
                 if (icon) {
                     icon.innerHTML = '🚴';
                     icon.style.color = '#ff0055';
@@ -627,21 +625,29 @@
         });
 
         const characters = {
-            'amir': {
+            amir: {
                 name: 'امیرمحمد',
                 color: '#00f2ff'
             },
-            'mahdi': {
+            mahdi: {
                 name: 'مهدی',
                 color: '#00ff66'
             },
-            'amirreza': {
+            amirreza: {
                 name: 'امیررضا',
                 color: '#ff0055'
             },
-            'pejoo': {
+            pejoo: {
                 name: 'داریوش',
                 color: '#aa00ff'
+            },
+            farhad: {
+                name: 'فرهاد',
+                color: '#ffaa00'
+            },
+            custom: {
+                name: 'عکس دلخواه',
+                color: '#ff66cc'
             }
         };
 
@@ -662,16 +668,21 @@
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
+
             canvas.width = width;
             canvas.height = height;
+
             player.y = height - 150;
             updatePlayerTargetX();
             player.x = player.targetX;
         }
+
         window.addEventListener('resize', resize);
         resize();
 
+        // انتخاب کاراکتر
         function selectChar(key) {
+
             selectedCharKey = key;
             player.color = characters[key].color;
 
@@ -681,36 +692,117 @@
                 card.style.boxShadow = 'none';
             });
 
-            const selectedCard = event.currentTarget;
-            selectedCard.classList.add('selected');
-            selectedCard.style.borderColor = characters[key].color;
-            selectedCard.style.boxShadow = `0 0 15px ${characters[key].color}`;
+            const selectedCard = document.querySelector(
+                `.char-card[data-character="${key}"]`
+            );
+
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedCard.style.borderColor = characters[key].color;
+                selectedCard.style.boxShadow = `0 0 15px ${characters[key].color}`;
+            }
         }
 
-        // ✅ توابع کنترل با پشتیبانی کامل لمسی
+        // کلیک روی کاراکتر عکس دلخواه
+        function handleCustomCharacterClick() {
+
+            if (
+                charImages.custom.complete &&
+                charImages.custom.naturalWidth > 0
+            ) {
+                selectChar('custom');
+            } else {
+                customImageInput.click();
+            }
+        }
+
+        // دریافت تصویر از حافظه دستگاه
+        function handleCustomImageUpload(event) {
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('لطفاً یک فایل تصویری انتخاب کنید.');
+                customImageInput.value = '';
+                return;
+            }
+
+            const imageUrl = URL.createObjectURL(file);
+            const previewImage = new Image();
+
+            previewImage.onload = function() {
+
+                if (customImageObjectUrl) {
+                    URL.revokeObjectURL(customImageObjectUrl);
+                }
+
+                customImageObjectUrl = imageUrl;
+
+                charImages.custom.src = imageUrl;
+
+                // نمایش تصویر در کارت انتخاب کاراکتر
+                const icon = document.getElementById('custom-icon');
+
+                icon.innerHTML = '';
+                icon.style.background = 'none';
+                icon.style.backgroundImage = `url("${imageUrl}")`;
+                icon.style.backgroundSize = 'cover';
+                icon.style.backgroundPosition = 'center';
+
+                // انتخاب خودکار کاراکتر
+                selectChar('custom');
+
+                customImageInput.value = '';
+            };
+
+            previewImage.onerror = function() {
+
+                URL.revokeObjectURL(imageUrl);
+
+                alert('مشکلی در بارگذاری تصویر وجود دارد. لطفاً تصویر دیگری انتخاب کنید.');
+
+                customImageInput.value = '';
+            };
+
+            previewImage.src = imageUrl;
+        }
+
+        customImageInput.addEventListener('change', handleCustomImageUpload);
+
+        // کنترل صدا
         function toggleSound() {
+
             soundEnabled = !soundEnabled;
 
             if (soundEnabled) {
+
                 soundControl.innerHTML = '🔊';
                 soundControl.classList.remove('muted');
+
                 if (gameRunning && !gamePaused) {
                     bgMusic.volume = 0.3;
                     bgMusic.play().catch(e => console.log(e));
                 }
+
             } else {
+
                 soundControl.innerHTML = '🔇';
                 soundControl.classList.add('muted');
                 bgMusic.pause();
             }
         }
 
+        // توقف و ادامه بازی
         function togglePause() {
+
             if (!gameRunning) return;
 
             gamePaused = !gamePaused;
 
             if (gamePaused) {
+
                 pauseControl.innerHTML = '▶️';
                 pauseControl.classList.add('paused');
                 pauseScreen.style.display = 'flex';
@@ -720,7 +812,9 @@
                 }
 
                 cancelAnimationFrame(animationId);
+
             } else {
+
                 pauseControl.innerHTML = '⏸️';
                 pauseControl.classList.remove('paused');
                 pauseScreen.style.display = 'none';
@@ -733,18 +827,22 @@
             }
         }
 
+        // خروج به منو
         function quitToMenu() {
+
             gameRunning = false;
             gamePaused = false;
-            cancelAnimationFrame(animationId);
 
+            cancelAnimationFrame(animationId);
             stopBackgroundMusic();
 
             pauseScreen.style.display = 'none';
             pauseControl.style.display = 'none';
+            soundControl.style.display = 'none';
             speedDisplay.style.display = 'none';
             scoreDisplay.style.display = 'none';
             godModeIndicator.style.display = 'none';
+
             document.getElementById('menu-layer').style.display = 'flex';
 
             score = 0;
@@ -752,15 +850,22 @@
             speedLevel = 1;
             frame = 0;
             godMode = false;
+
             obstacles = [];
             particles = [];
             shockwave = null;
+
+            scoreDisplay.innerText = 'امتیاز: 0';
+            speedDisplay.innerText = 'سرعت: 1x';
         }
 
         function startBackgroundMusic() {
+
             if (soundEnabled) {
+
                 bgMusic.volume = 0.3;
                 bgMusic.loop = true;
+
                 bgMusic.play().catch(e => {
                     console.log('پخش موسیقی نیاز به تعامل کاربر دارد:', e);
                 });
@@ -772,22 +877,26 @@
             bgMusic.currentTime = 0;
         }
 
-        // 🔮 فعال/غیرفعال کردن حالت شکست‌ناپذیر
+        // حالت شکست‌ناپذیر
         function toggleGodMode() {
+
             godMode = !godMode;
 
             if (godMode) {
+
                 godModeIndicator.style.display = 'block';
                 scoreDisplay.style.textShadow = '0 0 20px #aa00ff';
+
             } else {
+
                 godModeIndicator.style.display = 'none';
                 scoreDisplay.style.textShadow = '0 0 10px #fff';
             }
         }
 
-        // 🔮 بررسی کلیک‌های مخفی روی امتیاز
+        // فعال‌سازی مخفی با پنج کلیک روی امتیاز
         function checkSecretClick(e) {
-            // ✅ جلوگیری از رفتار پیش‌فرض لمس
+
             if (e) e.preventDefault();
 
             godModeClicks++;
@@ -807,26 +916,33 @@
         }
 
         function increaseSpeed() {
+
             const now = frame;
 
             if (now - lastSpeedUpFrame >= 200 && speedLevel < 10) {
+
                 speed += 0.8;
                 speedLevel++;
                 lastSpeedUpFrame = now;
 
                 speedDisplay.innerText = `سرعت: ${speedLevel}x`;
+
                 speedUpNotify.classList.remove('show');
                 void speedUpNotify.offsetWidth;
                 speedUpNotify.classList.add('show');
             }
         }
 
+        // شروع بازی
         function startGame() {
+
             bgMusic.load();
             crashSound.load();
+
             startBackgroundMusic();
 
             document.getElementById('menu-layer').style.display = 'none';
+
             scoreDisplay.style.display = 'block';
             speedDisplay.style.display = 'block';
             pauseControl.style.display = 'flex';
@@ -838,11 +954,13 @@
 
             gameRunning = true;
             gamePaused = false;
+
             score = 0;
             speed = baseSpeed;
             speedLevel = 1;
             frame = 0;
             lastSpeedUpFrame = 0;
+
             obstacles = [];
             particles = [];
             shockwave = null;
@@ -851,15 +969,20 @@
             updatePlayerTargetX();
             player.x = player.targetX;
 
-            speedDisplay.innerText = `سرعت: ${speedLevel}x`;
+            scoreDisplay.innerText = 'امتیاز: 0';
+            speedDisplay.innerText = 'سرعت: 1x';
+
             pauseControl.innerHTML = '⏸️';
             pauseControl.classList.remove('paused');
 
             animate();
         }
 
+        // شروع مجدد سریع
         function quickRestart() {
+
             cancelAnimationFrame(animationId);
+
             document.getElementById('game-over-layer').style.display = 'none';
             document.body.classList.remove('screen-shake');
 
@@ -871,138 +994,189 @@
 
             gameRunning = true;
             gamePaused = false;
+
             score = 0;
             speed = baseSpeed;
             speedLevel = 1;
             frame = 0;
             lastSpeedUpFrame = 0;
+
             obstacles = [];
             particles = [];
             shockwave = null;
+
             player.lane = 1;
             player.color = characters[selectedCharKey].color;
+
             updatePlayerTargetX();
             player.x = player.targetX;
+
             scoreDisplay.style.display = 'block';
             speedDisplay.style.display = 'block';
             pauseControl.style.display = 'flex';
             soundControl.style.display = 'flex';
-            speedDisplay.innerText = `سرعت: ${speedLevel}x`;
-            scoreDisplay.innerText = `امتیاز: 0`;
+
+            scoreDisplay.innerText = 'امتیاز: 0';
+            speedDisplay.innerText = 'سرعت: 1x';
+
             pauseControl.innerHTML = '⏸️';
             pauseControl.classList.remove('paused');
+
             animate();
         }
 
+        // پایان بازی
         function gameOver() {
-            if (godMode) {
-                return;
-            }
+
+            if (godMode) return;
 
             gameRunning = false;
             gamePaused = false;
-            cancelAnimationFrame(animationId);
 
+            cancelAnimationFrame(animationId);
             stopBackgroundMusic();
 
             if (soundEnabled) {
+
                 try {
+
                     crashSound.currentTime = 0;
                     crashSound.volume = 0.5;
-                    crashSound.play().catch(e => console.log('صدا پخش نشد:', e));
+
+                    crashSound.play().catch(e => {
+                        console.log('صدا پخش نشد:', e);
+                    });
+
                 } catch (e) {
                     console.log('خطا در پخش صدا:', e);
                 }
             }
 
             document.body.classList.add('screen-shake');
+
             setTimeout(() => {
                 document.body.classList.remove('screen-shake');
             }, 500);
 
             pauseControl.style.display = 'none';
             soundControl.style.display = 'none';
-            document.getElementById('game-over-layer').style.display = 'flex';
-            document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)} | سرعت: ${speedLevel}x`;
 
-            createShatterEffect(player.x, player.y, characters[selectedCharKey].color);
+            document.getElementById('game-over-layer').style.display = 'flex';
+
+            document.getElementById('final-score').innerText =
+                `امتیاز نهایی: ${Math.floor(score)} | سرعت: ${speedLevel}x`;
+
+            createShatterEffect(
+                player.x,
+                player.y,
+                characters[selectedCharKey].color
+            );
+
             draw();
         }
 
+        // حرکت چپ
         function moveLeft() {
+
             if (gamePaused) return;
-            if (player.lane > 0) player.lane--;
+
+            if (player.lane > 0) {
+                player.lane--;
+            }
+
             updatePlayerTargetX();
         }
 
+        // حرکت راست
         function moveRight() {
+
             if (gamePaused) return;
-            if (player.lane < 2) player.lane++;
+
+            if (player.lane < 2) {
+                player.lane++;
+            }
+
             updatePlayerTargetX();
         }
 
         function updatePlayerTargetX() {
+
             const laneWidth = width / 3;
-            player.targetX = (player.lane * laneWidth) + (laneWidth / 2);
+
+            player.targetX =
+                (player.lane * laneWidth) + (laneWidth / 2);
         }
 
-        // ✅ رویدادهای لمسی برای امتیاز (حالت مخفی)
+        // کلیک مخفی روی امتیاز
         scoreDisplay.addEventListener('click', (e) => {
             if (gameRunning) checkSecretClick(e);
         });
+
         scoreDisplay.addEventListener('touchstart', (e) => {
             if (gameRunning) checkSecretClick(e);
-        }, {
-            passive: false
-        });
+        }, { passive: false });
 
-        // ✅ رویدادهای لمسی برای دکمه صدا
+        // کنترل صدا
         soundControl.addEventListener('click', (e) => {
             e.preventDefault();
             toggleSound();
         });
+
         soundControl.addEventListener('touchstart', (e) => {
             e.preventDefault();
             toggleSound();
-        }, {
-            passive: false
-        });
+        }, { passive: false });
 
-        // ✅ رویدادهای لمسی برای دکمه توقف
+        // کنترل توقف
         pauseControl.addEventListener('click', (e) => {
             e.preventDefault();
             togglePause();
         });
+
         pauseControl.addEventListener('touchstart', (e) => {
             e.preventDefault();
             togglePause();
-        }, {
-            passive: false
-        });
+        }, { passive: false });
 
-        // کنترل‌های حرکت بازی
+        // کنترل لمسی حرکت
         window.addEventListener('touchstart', (e) => {
-            // ✅ اگر روی دکمه‌ها لمس شد، حرکت نکند
-            if (e.target.closest('.control-btn') || e.target.closest('#score-display')) return;
+
+            if (
+                e.target.closest('.control-btn') ||
+                e.target.closest('#score-display')
+            ) return;
 
             if (!gameRunning || gamePaused) return;
-            e.preventDefault();
-            const touchX = e.touches[0].clientX;
-            if (touchX < width / 2) moveLeft();
-            else moveRight();
-        }, {
-            passive: false
-        });
 
+            e.preventDefault();
+
+            const touchX = e.touches[0].clientX;
+
+            if (touchX < width / 2) {
+                moveLeft();
+            } else {
+                moveRight();
+            }
+
+        }, { passive: false });
+
+        // کنترل کیبورد
         window.addEventListener('keydown', (e) => {
+
             if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+
                 if (gameRunning) {
                     togglePause();
                     return;
                 }
             }
 
-            if (e.ctrlKey && e.shiftKey && (e.key === 'g' || e.key === 'G')) {
+            if (
+                e.ctrlKey &&
+                e.shiftKey &&
+                (e.key === 'g' || e.key === 'G')
+            ) {
+
                 if (gameRunning) {
                     toggleGodMode();
                     e.preventDefault();
@@ -1010,15 +1184,28 @@
             }
 
             if (!gameRunning || gamePaused) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
-            if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
+
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                moveLeft();
+            }
+
+            if (e.key === 'ArrowRight' || e.key === 'd') {
+                moveRight();
+            }
         });
 
+        // موانع
         class Obstacle {
+
             constructor() {
+
                 const laneWidth = width / 3;
+
                 this.lane = Math.floor(Math.random() * 3);
-                this.x = (this.lane * laneWidth) + (laneWidth / 2);
+
+                this.x =
+                    (this.lane * laneWidth) + (laneWidth / 2);
+
                 this.y = -100;
                 this.width = 50;
                 this.height = 50;
@@ -1030,34 +1217,58 @@
             }
 
             draw() {
+
                 ctx.fillStyle = this.color;
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = this.color;
+
                 ctx.beginPath();
+
                 if (ctx.roundRect) {
-                    ctx.roundRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, 10);
+
+                    ctx.roundRect(
+                        this.x - this.width / 2,
+                        this.y - this.height / 2,
+                        this.width,
+                        this.height,
+                        10
+                    );
+
                 } else {
-                    ctx.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+
+                    ctx.rect(
+                        this.x - this.width / 2,
+                        this.y - this.height / 2,
+                        this.width,
+                        this.height
+                    );
                 }
+
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
         }
 
+        // ذرات انفجار
         class ShatterParticle {
+
             constructor(x, y, color, isPlayerPiece = false) {
+
                 this.x = x;
                 this.y = y;
                 this.color = color;
                 this.isPlayerPiece = isPlayerPiece;
 
                 if (isPlayerPiece) {
+
                     this.size = Math.random() * 15 + 8;
                     this.speedX = (Math.random() - 0.5) * 20;
                     this.speedY = (Math.random() - 0.5) * 20;
                     this.rotation = Math.random() * Math.PI * 2;
                     this.rotationSpeed = (Math.random() - 0.5) * 0.5;
+
                 } else {
+
                     this.size = Math.random() * 5 + 2;
                     this.speedX = (Math.random() - 0.5) * 15;
                     this.speedY = (Math.random() - 0.5) * 15;
@@ -1066,50 +1277,68 @@
                 }
 
                 this.life = 1;
-                this.decay = isPlayerPiece ? 0.008 + Math.random() * 0.005 : 0.015 + Math.random() * 0.01;
+
+                this.decay = isPlayerPiece
+                    ? 0.008 + Math.random() * 0.005
+                    : 0.015 + Math.random() * 0.01;
+
                 this.gravity = 0.3;
             }
 
             update() {
+
                 this.x += this.speedX;
                 this.y += this.speedY;
+
                 this.speedY += this.gravity;
                 this.speedX *= 0.98;
+
                 this.rotation += this.rotationSpeed;
                 this.life -= this.decay;
             }
 
             draw() {
+
                 ctx.save();
+
                 ctx.globalAlpha = this.life;
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
 
                 if (this.isPlayerPiece) {
+
                     ctx.fillStyle = this.color;
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = this.color;
+
                     ctx.beginPath();
                     ctx.moveTo(0, -this.size);
                     ctx.lineTo(this.size / 2, this.size / 2);
                     ctx.lineTo(-this.size / 2, this.size / 2);
                     ctx.closePath();
                     ctx.fill();
+
                 } else {
+
                     ctx.fillStyle = this.color;
+
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
                 ctx.restore();
+
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
             }
         }
 
+        // موج انفجار
         class Shockwave {
+
             constructor(x, y, color) {
+
                 this.x = x;
                 this.y = y;
                 this.color = color;
@@ -1120,74 +1349,115 @@
             }
 
             update() {
+
                 this.radius += this.speed;
-                this.opacity = 1 - (this.radius / this.maxRadius);
+
+                this.opacity =
+                    1 - (this.radius / this.maxRadius);
             }
 
             draw() {
+
                 if (this.opacity <= 0) return;
+
                 ctx.save();
+
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+                ctx.arc(
+                    this.x,
+                    this.y,
+                    this.radius,
+                    0,
+                    Math.PI * 2
+                );
+
                 ctx.strokeStyle = this.color;
                 ctx.lineWidth = 5;
                 ctx.globalAlpha = this.opacity;
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = this.color;
+
                 ctx.stroke();
+
                 ctx.restore();
+
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
             }
         }
 
         function createShatterEffect(x, y, color) {
+
             for (let i = 0; i < 20; i++) {
-                particles.push(new ShatterParticle(x, y, color, true));
+                particles.push(
+                    new ShatterParticle(x, y, color, true)
+                );
             }
+
             for (let i = 0; i < 50; i++) {
-                particles.push(new ShatterParticle(x, y, color, false));
+                particles.push(
+                    new ShatterParticle(x, y, color, false)
+                );
             }
+
             shockwave = new Shockwave(x, y, color);
 
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.fillRect(0, 0, width, height);
         }
 
+        // رسم جاده
         function drawRoad() {
+
             const laneWidth = width / 3;
 
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 2;
+
             ctx.setLineDash([20, 20]);
             ctx.lineDashOffset = -frame * speed;
 
             for (let i = 1; i < 3; i++) {
+
                 const x = i * laneWidth;
+
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
                 ctx.lineTo(x, height);
                 ctx.stroke();
             }
+
             ctx.setLineDash([]);
         }
 
+        // رسم بازیکن
         function drawPlayer() {
-            player.x += (player.targetX - player.x) * 0.2;
+
+            player.x +=
+                (player.targetX - player.x) * 0.2;
 
             const img = charImages[selectedCharKey];
 
             ctx.save();
 
             if (godMode) {
+
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = '#aa00ff';
+
             } else {
+
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = player.color;
             }
 
-            if (img && img.complete && img.naturalWidth !== 0) {
+            if (
+                img &&
+                img.complete &&
+                img.naturalWidth !== 0
+            ) {
+
                 ctx.drawImage(
                     img,
                     player.x - player.width / 2,
@@ -1195,102 +1465,178 @@
                     player.width,
                     player.height
                 );
+
             } else {
+
                 ctx.fillStyle = player.color;
+
                 ctx.beginPath();
-                ctx.arc(player.x, player.y, player.width / 2, 0, Math.PI * 2);
+                ctx.arc(
+                    player.x,
+                    player.y,
+                    player.width / 2,
+                    0,
+                    Math.PI * 2
+                );
+
                 ctx.fill();
+
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 10px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+
                 ctx.fillText('🚴', player.x, player.y);
             }
 
             ctx.restore();
         }
 
+        // بررسی برخورد
         function checkCollision(obs) {
+
             const dx = Math.abs(player.x - obs.x);
             const dy = Math.abs(player.y - obs.y);
-            return (dx < (player.width / 2 + obs.width / 2 - 15) &&
-                dy < (player.height / 2 + obs.height / 2 - 15));
+
+            return (
+                dx < (player.width / 2 + obs.width / 2 - 15) &&
+                dy < (player.height / 2 + obs.height / 2 - 15)
+            );
         }
 
+        // رسم اولیه
         function draw() {
+
             ctx.clearRect(0, 0, width, height);
+
             drawRoad();
+
             obstacles.forEach(obs => obs.draw());
-            if (gameRunning && !gamePaused) drawPlayer();
+
+            if (gameRunning && !gamePaused) {
+                drawPlayer();
+            }
+
             particles.forEach(p => p.draw());
-            if (shockwave) shockwave.draw();
+
+            if (shockwave) {
+                shockwave.draw();
+            }
         }
 
+        // حلقه اصلی بازی
         function animate() {
+
             if (gamePaused) return;
-            if (!gameRunning && particles.length === 0 && (!shockwave || shockwave.opacity <= 0)) return;
+
+            if (
+                !gameRunning &&
+                particles.length === 0 &&
+                (!shockwave || shockwave.opacity <= 0)
+            ) return;
 
             ctx.clearRect(0, 0, width, height);
+
             drawRoad();
 
             if (gameRunning) {
+
                 increaseSpeed();
 
-                const obstacleInterval = Math.max(20, 60 - speedLevel * 5);
+                const obstacleInterval =
+                    Math.max(20, 60 - speedLevel * 5);
+
                 if (frame % obstacleInterval === 0) {
+
                     obstacles.push(new Obstacle());
                     score += 10;
                 }
 
-                for (let i = obstacles.length - 1; i >= 0; i--) {
+                for (
+                    let i = obstacles.length - 1;
+                    i >= 0;
+                    i--
+                ) {
+
                     let obs = obstacles[i];
+
                     obs.update();
                     obs.draw();
 
                     if (checkCollision(obs)) {
-                        gameOver();
+
                         if (godMode) {
+
                             obstacles.splice(i, 1);
                             score += 5;
+
                         } else {
+
+                            gameOver();
                             return;
                         }
                     }
 
                     if (obs.y > height + 100) {
+
                         obstacles.splice(i, 1);
                         score += 2;
                     }
                 }
 
                 drawPlayer();
+
                 score += 0.15 * speedLevel;
-                scoreDisplay.innerText = `امتیاز: ${Math.floor(score)}`;
+
+                scoreDisplay.innerText =
+                    `امتیاز: ${Math.floor(score)}`;
+
                 frame++;
             }
 
-            for (let i = particles.length - 1; i >= 0; i--) {
+            for (
+                let i = particles.length - 1;
+                i >= 0;
+                i--
+            ) {
+
                 let p = particles[i];
+
                 p.update();
                 p.draw();
-                if (p.life <= 0) particles.splice(i, 1);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
             }
 
             if (shockwave) {
+
                 shockwave.update();
                 shockwave.draw();
-                if (shockwave.opacity <= 0) shockwave = null;
+
+                if (shockwave.opacity <= 0) {
+                    shockwave = null;
+                }
             }
 
-            if (gameRunning || particles.length > 0 || shockwave) {
-                animationId = requestAnimationFrame(animate);
+            if (
+                gameRunning ||
+                particles.length > 0 ||
+                shockwave
+            ) {
+
+                animationId =
+                    requestAnimationFrame(animate);
             }
         }
 
+        // اجرای اولیه
         resize();
         drawRoad();
         drawPlayer();
-    </script>
-</body>
 
+    </script>
+
+</body>
 </html>
