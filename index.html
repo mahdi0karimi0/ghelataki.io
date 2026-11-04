@@ -138,13 +138,13 @@
             /* ✅ جلوگیری از هایلایت شدن در موبایل */
             -webkit-tap-highlight-color: transparent;
         }
-
+        
         #score-display:active {
             transform: scale(0.95);
             opacity: 0.8;
         }
-
         /* 🔮 نشانگر حالت مخفی */
+        
         #god-mode-indicator {
             display: none;
             position: absolute;
@@ -155,12 +155,21 @@
             pointer-events: none;
             z-index: 100;
         }
-
+        
         @keyframes godPulse {
-            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 10px #aa00ff; }
-            50% { opacity: 0.7; transform: scale(1.1); text-shadow: 0 0 20px #aa00ff; }
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                text-shadow: 0 0 10px #aa00ff;
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+                text-shadow: 0 0 20px #aa00ff;
+            }
         }
-
+        
         #speed-display {
             position: absolute;
             top: 20px;
@@ -173,7 +182,7 @@
             display: none;
             z-index: 100;
         }
-
+        
         #speed-up-notify {
             position: absolute;
             top: 50%;
@@ -188,15 +197,23 @@
             z-index: 100;
             transition: opacity 0.3s;
         }
-
+        
         #speed-up-notify.show {
             animation: speedUpFlash 1s ease-out;
         }
-
+        
         @keyframes speedUpFlash {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
         
         #game-over {
@@ -257,15 +274,30 @@
         }
         
         @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            70% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            75% {
+                transform: translateX(10px);
+            }
         }
         
         .screen-shake {
@@ -273,19 +305,40 @@
         }
         
         @keyframes screenShake {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-5px, -5px); }
-            20% { transform: translate(5px, 5px); }
-            30% { transform: translate(-5px, 5px); }
-            40% { transform: translate(5px, -5px); }
-            50% { transform: translate(-5px, -5px); }
-            60% { transform: translate(5px, 5px); }
-            70% { transform: translate(-5px, 5px); }
-            80% { transform: translate(5px, -5px); }
-            90% { transform: translate(-5px, -5px); }
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            10% {
+                transform: translate(-5px, -5px);
+            }
+            20% {
+                transform: translate(5px, 5px);
+            }
+            30% {
+                transform: translate(-5px, 5px);
+            }
+            40% {
+                transform: translate(5px, -5px);
+            }
+            50% {
+                transform: translate(-5px, -5px);
+            }
+            60% {
+                transform: translate(5px, 5px);
+            }
+            70% {
+                transform: translate(-5px, 5px);
+            }
+            80% {
+                transform: translate(5px, -5px);
+            }
+            90% {
+                transform: translate(-5px, -5px);
+            }
         }
-
         /* ✅ دکمه‌های کنترل - بهینه برای موبایل */
+        
         .control-btn {
             position: absolute;
             top: 20px;
@@ -295,7 +348,8 @@
             width: 50px;
             height: 50px;
             cursor: pointer;
-            display: none; /* پیش‌فرض مخفی */
+            display: none;
+            /* پیش‌فرض مخفی */
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
@@ -306,45 +360,50 @@
             -webkit-tap-highlight-color: transparent;
             border: 2px solid #fff;
         }
-
+        
         .control-btn:active {
             transform: scale(0.9);
             background: rgba(255, 255, 255, 0.2);
         }
-
+        
         #sound-control {
             right: 20px;
             border-color: #00f2ff;
         }
-
+        
         #sound-control:hover {
             background: rgba(0, 242, 255, 0.3);
         }
-
+        
         #sound-control.muted {
             border-color: #ff0055;
             opacity: 0.5;
         }
-
+        
         #pause-control {
             right: 80px;
             border-color: #00ff66;
         }
-
+        
         #pause-control:hover {
             background: rgba(0, 255, 102, 0.3);
         }
-
+        
         #pause-control.paused {
             border-color: #ffaa00;
             animation: pulse 1s infinite;
         }
-
+        
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px #ffaa00; }
-            50% { box-shadow: 0 0 20px #ffaa00; }
+            0%,
+            100% {
+                box-shadow: 0 0 10px #ffaa00;
+            }
+            50% {
+                box-shadow: 0 0 20px #ffaa00;
+            }
         }
-
+        
         #pause-screen {
             position: absolute;
             top: 0;
@@ -360,7 +419,7 @@
             pointer-events: auto;
             backdrop-filter: blur(5px);
         }
-
+        
         #pause-screen h2 {
             color: #ffaa00;
             font-size: 3rem;
@@ -368,24 +427,29 @@
             text-shadow: 0 0 20px #ffaa00;
             animation: pausePulse 1.5s infinite;
         }
-
+        
         @keyframes pausePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
         }
-
+        
         #pause-screen p {
             color: #fff;
             font-size: 1.2rem;
             margin-bottom: 40px;
             opacity: 0.7;
         }
-
+        
         .pause-btn-group {
             display: flex;
             gap: 20px;
         }
-
+        
         .pause-btn {
             padding: 15px 40px;
             font-size: 1.2rem;
@@ -396,27 +460,27 @@
             transition: all 0.3s;
             pointer-events: auto;
         }
-
+        
         #resume-btn {
             background: linear-gradient(45deg, #00ff66, #00cc55);
             color: #000;
             box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
         }
-
+        
         #resume-btn:active {
             transform: scale(0.95);
         }
-
+        
         #quit-btn {
             background: linear-gradient(45deg, #ff0055, #ff66cc);
             color: #fff;
             box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
         }
-
+        
         #quit-btn:active {
             transform: scale(0.95);
         }
-
+        
         .shortcut-hint {
             position: absolute;
             bottom: 60px;
@@ -426,7 +490,7 @@
             font-size: 0.85rem;
             pointer-events: none;
         }
-
+        
         .god-mode-player {
             filter: drop-shadow(0 0 20px #aa00ff) drop-shadow(0 0 40px #aa00ff);
         }
@@ -471,7 +535,7 @@
                 </div>
                 <div class="char-card" onclick="selectChar('pejoo')" style="color: #aa00ff;">
                     <div class="char-icon" id="pejoo-icon">در حال بارگیری...</div>
-                    <div class="char-name">پژو</div>
+                    <div class="char-name">داریوش</div>
                 </div>
             </div>
             <button id="start-btn" onclick="startGame()">شروع مسابقه</button>
@@ -563,10 +627,22 @@
         });
 
         const characters = {
-            'amir': { name: 'امیرمحمد', color: '#00f2ff' },
-            'mahdi': { name: 'مهدی', color: '#00ff66' },
-            'amirreza': { name: 'امیررضا', color: '#ff0055' },
-            'pejoo': { name: 'پژو', color: '#aa00ff' }
+            'amir': {
+                name: 'امیرمحمد',
+                color: '#00f2ff'
+            },
+            'mahdi': {
+                name: 'مهدی',
+                color: '#00ff66'
+            },
+            'amirreza': {
+                name: 'امیررضا',
+                color: '#ff0055'
+            },
+            'pejoo': {
+                name: 'داریوش',
+                color: '#aa00ff'
+            }
         };
 
         const player = {
@@ -604,7 +680,7 @@
                 card.style.borderColor = '#333';
                 card.style.boxShadow = 'none';
             });
-            
+
             const selectedCard = event.currentTarget;
             selectedCard.classList.add('selected');
             selectedCard.style.borderColor = characters[key].color;
@@ -614,7 +690,7 @@
         // ✅ توابع کنترل با پشتیبانی کامل لمسی
         function toggleSound() {
             soundEnabled = !soundEnabled;
-            
+
             if (soundEnabled) {
                 soundControl.innerHTML = '🔊';
                 soundControl.classList.remove('muted');
@@ -631,28 +707,28 @@
 
         function togglePause() {
             if (!gameRunning) return;
-            
+
             gamePaused = !gamePaused;
-            
+
             if (gamePaused) {
                 pauseControl.innerHTML = '▶️';
                 pauseControl.classList.add('paused');
                 pauseScreen.style.display = 'flex';
-                
+
                 if (soundEnabled) {
                     bgMusic.pause();
                 }
-                
+
                 cancelAnimationFrame(animationId);
             } else {
                 pauseControl.innerHTML = '⏸️';
                 pauseControl.classList.remove('paused');
                 pauseScreen.style.display = 'none';
-                
+
                 if (soundEnabled) {
                     bgMusic.play().catch(e => console.log(e));
                 }
-                
+
                 animate();
             }
         }
@@ -661,16 +737,16 @@
             gameRunning = false;
             gamePaused = false;
             cancelAnimationFrame(animationId);
-            
+
             stopBackgroundMusic();
-            
+
             pauseScreen.style.display = 'none';
             pauseControl.style.display = 'none';
             speedDisplay.style.display = 'none';
             scoreDisplay.style.display = 'none';
             godModeIndicator.style.display = 'none';
             document.getElementById('menu-layer').style.display = 'flex';
-            
+
             score = 0;
             speed = baseSpeed;
             speedLevel = 1;
@@ -699,7 +775,7 @@
         // 🔮 فعال/غیرفعال کردن حالت شکست‌ناپذیر
         function toggleGodMode() {
             godMode = !godMode;
-            
+
             if (godMode) {
                 godModeIndicator.style.display = 'block';
                 scoreDisplay.style.textShadow = '0 0 20px #aa00ff';
@@ -713,17 +789,17 @@
         function checkSecretClick(e) {
             // ✅ جلوگیری از رفتار پیش‌فرض لمس
             if (e) e.preventDefault();
-            
+
             godModeClicks++;
-            
+
             if (godModeClickTimer) {
                 clearTimeout(godModeClickTimer);
             }
-            
+
             godModeClickTimer = setTimeout(() => {
                 godModeClicks = 0;
             }, 1000);
-            
+
             if (godModeClicks >= 5) {
                 toggleGodMode();
                 godModeClicks = 0;
@@ -732,12 +808,12 @@
 
         function increaseSpeed() {
             const now = frame;
-            
+
             if (now - lastSpeedUpFrame >= 200 && speedLevel < 10) {
                 speed += 0.8;
                 speedLevel++;
                 lastSpeedUpFrame = now;
-                
+
                 speedDisplay.innerText = `سرعت: ${speedLevel}x`;
                 speedUpNotify.classList.remove('show');
                 void speedUpNotify.offsetWidth;
@@ -749,17 +825,17 @@
             bgMusic.load();
             crashSound.load();
             startBackgroundMusic();
-            
+
             document.getElementById('menu-layer').style.display = 'none';
             scoreDisplay.style.display = 'block';
             speedDisplay.style.display = 'block';
             pauseControl.style.display = 'flex';
             soundControl.style.display = 'flex';
-            
+
             godMode = false;
             godModeIndicator.style.display = 'none';
             scoreDisplay.style.textShadow = '0 0 10px #fff';
-            
+
             gameRunning = true;
             gamePaused = false;
             score = 0;
@@ -770,15 +846,15 @@
             obstacles = [];
             particles = [];
             shockwave = null;
-            
+
             player.lane = 1;
             updatePlayerTargetX();
             player.x = player.targetX;
-            
+
             speedDisplay.innerText = `سرعت: ${speedLevel}x`;
             pauseControl.innerHTML = '⏸️';
             pauseControl.classList.remove('paused');
-            
+
             animate();
         }
 
@@ -786,13 +862,13 @@
             cancelAnimationFrame(animationId);
             document.getElementById('game-over-layer').style.display = 'none';
             document.body.classList.remove('screen-shake');
-            
+
             startBackgroundMusic();
-            
+
             godMode = false;
             godModeIndicator.style.display = 'none';
             scoreDisplay.style.textShadow = '0 0 10px #fff';
-            
+
             gameRunning = true;
             gamePaused = false;
             score = 0;
@@ -822,33 +898,33 @@
             if (godMode) {
                 return;
             }
-            
+
             gameRunning = false;
             gamePaused = false;
             cancelAnimationFrame(animationId);
-            
+
             stopBackgroundMusic();
-            
+
             if (soundEnabled) {
                 try {
                     crashSound.currentTime = 0;
                     crashSound.volume = 0.5;
                     crashSound.play().catch(e => console.log('صدا پخش نشد:', e));
-                } catch(e) {
+                } catch (e) {
                     console.log('خطا در پخش صدا:', e);
                 }
             }
-            
+
             document.body.classList.add('screen-shake');
             setTimeout(() => {
                 document.body.classList.remove('screen-shake');
             }, 500);
-            
+
             pauseControl.style.display = 'none';
             soundControl.style.display = 'none';
             document.getElementById('game-over-layer').style.display = 'flex';
             document.getElementById('final-score').innerText = `امتیاز نهایی: ${Math.floor(score)} | سرعت: ${speedLevel}x`;
-            
+
             createShatterEffect(player.x, player.y, characters[selectedCharKey].color);
             draw();
         }
@@ -876,7 +952,9 @@
         });
         scoreDisplay.addEventListener('touchstart', (e) => {
             if (gameRunning) checkSecretClick(e);
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         // ✅ رویدادهای لمسی برای دکمه صدا
         soundControl.addEventListener('click', (e) => {
@@ -886,7 +964,9 @@
         soundControl.addEventListener('touchstart', (e) => {
             e.preventDefault();
             toggleSound();
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         // ✅ رویدادهای لمسی برای دکمه توقف
         pauseControl.addEventListener('click', (e) => {
@@ -896,19 +976,23 @@
         pauseControl.addEventListener('touchstart', (e) => {
             e.preventDefault();
             togglePause();
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         // کنترل‌های حرکت بازی
         window.addEventListener('touchstart', (e) => {
             // ✅ اگر روی دکمه‌ها لمس شد، حرکت نکند
             if (e.target.closest('.control-btn') || e.target.closest('#score-display')) return;
-            
+
             if (!gameRunning || gamePaused) return;
             e.preventDefault();
             const touchX = e.touches[0].clientX;
             if (touchX < width / 2) moveLeft();
             else moveRight();
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
@@ -917,14 +1001,14 @@
                     return;
                 }
             }
-            
+
             if (e.ctrlKey && e.shiftKey && (e.key === 'g' || e.key === 'G')) {
                 if (gameRunning) {
                     toggleGodMode();
                     e.preventDefault();
                 }
             }
-            
+
             if (!gameRunning || gamePaused) return;
             if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
             if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
@@ -966,7 +1050,7 @@
                 this.y = y;
                 this.color = color;
                 this.isPlayerPiece = isPlayerPiece;
-                
+
                 if (isPlayerPiece) {
                     this.size = Math.random() * 15 + 8;
                     this.speedX = (Math.random() - 0.5) * 20;
@@ -980,12 +1064,12 @@
                     this.rotation = 0;
                     this.rotationSpeed = 0;
                 }
-                
+
                 this.life = 1;
                 this.decay = isPlayerPiece ? 0.008 + Math.random() * 0.005 : 0.015 + Math.random() * 0.01;
                 this.gravity = 0.3;
             }
-            
+
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -994,13 +1078,13 @@
                 this.rotation += this.rotationSpeed;
                 this.life -= this.decay;
             }
-            
+
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.life;
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
-                
+
                 if (this.isPlayerPiece) {
                     ctx.fillStyle = this.color;
                     ctx.shadowBlur = 10;
@@ -1017,7 +1101,7 @@
                     ctx.arc(0, 0, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                
+
                 ctx.restore();
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
@@ -1034,12 +1118,12 @@
                 this.speed = 15;
                 this.opacity = 1;
             }
-            
+
             update() {
                 this.radius += this.speed;
                 this.opacity = 1 - (this.radius / this.maxRadius);
             }
-            
+
             draw() {
                 if (this.opacity <= 0) return;
                 ctx.save();
@@ -1065,7 +1149,7 @@
                 particles.push(new ShatterParticle(x, y, color, false));
             }
             shockwave = new Shockwave(x, y, color);
-            
+
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.fillRect(0, 0, width, height);
         }
@@ -1092,9 +1176,9 @@
             player.x += (player.targetX - player.x) * 0.2;
 
             const img = charImages[selectedCharKey];
-            
+
             ctx.save();
-            
+
             if (godMode) {
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = '#aa00ff';
@@ -1102,7 +1186,7 @@
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = player.color;
             }
-            
+
             if (img && img.complete && img.naturalWidth !== 0) {
                 ctx.drawImage(
                     img,
@@ -1122,15 +1206,15 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText('🚴', player.x, player.y);
             }
-            
+
             ctx.restore();
         }
 
         function checkCollision(obs) {
             const dx = Math.abs(player.x - obs.x);
             const dy = Math.abs(player.y - obs.y);
-            return (dx < (player.width / 2 + obs.width / 2 - 15) && 
-                    dy < (player.height / 2 + obs.height / 2 - 15));
+            return (dx < (player.width / 2 + obs.width / 2 - 15) &&
+                dy < (player.height / 2 + obs.height / 2 - 15));
         }
 
         function draw() {
@@ -1151,7 +1235,7 @@
 
             if (gameRunning) {
                 increaseSpeed();
-                
+
                 const obstacleInterval = Math.max(20, 60 - speedLevel * 5);
                 if (frame % obstacleInterval === 0) {
                     obstacles.push(new Obstacle());
@@ -1191,7 +1275,7 @@
                 p.draw();
                 if (p.life <= 0) particles.splice(i, 1);
             }
-            
+
             if (shockwave) {
                 shockwave.update();
                 shockwave.draw();
